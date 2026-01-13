@@ -579,7 +579,7 @@ async def ai_chat(data: AIMessage, user = Depends(get_optional_user)):
                     "Content-Type": "application/json"
                 },
                 json={
-                    "model": "gpt-5-mini",
+                    "model": "gpt-4o-mini",
                     "messages": messages,
                     "temperature": 0.7,
                     "max_tokens": 500
