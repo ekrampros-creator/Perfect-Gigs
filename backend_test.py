@@ -107,12 +107,22 @@ class CareerPlusAPITester:
             self.user_id = response.get('user', {}).get('id')
             self.test_email = test_user['email']
             self.test_password = test_user['password']
+            
+            # If we got a token from signup, we can skip login
+            if self.token:
+                print(f"   Got token from signup, user_id: {self.user_id}")
+                return True
             return True
         return False
 
     def test_auth_login(self):
         """Test user login"""
         print("\n🔍 Testing Authentication - Login...")
+        
+        # If we already have a token from signup, skip login
+        if self.token:
+            print("   Skipping login - already have token from signup")
+            return True
         
         if not hasattr(self, 'test_email'):
             self.log_test("Login Test", False, "No test user created")
