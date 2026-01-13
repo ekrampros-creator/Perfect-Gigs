@@ -1,0 +1,111 @@
+{
+  "identity": {
+    "name": "Career Plus",
+    "persona": "The Neural Hive",
+    "vibe": "Cyber-Professional, Gen-Z, Dark Mode First, AI-Centric",
+    "emotional_tone": "Empowering, Fast, Intelligent, Sleek"
+  },
+  "typography": {
+    "primary_font": "Plus Jakarta Sans",
+    "heading_font": "Unbounded",
+    "mono_font": "JetBrains Mono",
+    "google_fonts_import": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Unbounded:wght@300;400;600;700&display=swap",
+    "usage": {
+      "h1": "font-unbounded font-bold text-5xl md:text-7xl tracking-tight leading-none",
+      "h2": "font-unbounded font-semibold text-3xl md:text-5xl tracking-tight",
+      "h3": "font-unbounded font-medium text-2xl tracking-wide",
+      "body": "font-jakarta text-base leading-relaxed text-muted-foreground",
+      "small": "font-jakarta text-sm font-medium tracking-wide uppercase text-muted-foreground/80",
+      "code": "font-mono text-xs bg-secondary/50 px-1 py-0.5 rounded"
+    }
+  },
+  "colors": {
+    "palette": {
+      "background": "#050505",
+      "foreground": "#f8fafc",
+      "card": "rgba(10, 10, 10, 0.6)",
+      "card_foreground": "#f8fafc",
+      "primary": "#7c3aed",
+      "primary_foreground": "#ffffff",
+      "secondary": "#1e1e2e",
+      "secondary_foreground": "#f8fafc",
+      "accent": "#ccf381",
+      "accent_foreground": "#050505",
+      "muted": "#1e1e2e",
+      "muted_foreground": "#94a3b8",
+      "border": "rgba(255, 255, 255, 0.08)",
+      "input": "rgba(255, 255, 255, 0.05)",
+      "ring": "#7c3aed"
+    },
+    "gradients": {
+      "hero_glow": "radial-gradient(circle at 50% 0%, rgba(124, 58, 237, 0.15) 0%, transparent 50%)",
+      "card_shine": "linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%)",
+      "button_primary": "linear-gradient(to right, #7c3aed, #6d28d9)"
+    }
+  },
+  "visual_enhancers": {
+    "glassmorphism": {
+      "default": "backdrop-blur-xl bg-black/40 border border-white/10 shadow-2xl",
+      "heavy": "backdrop-blur-2xl bg-black/60 border border-white/5 shadow-xl",
+      "light": "backdrop-blur-md bg-white/5 border border-white/10"
+    },
+    "shadows": {
+      "neon": "0 0 20px -5px rgba(124, 58, 237, 0.5)",
+      "glow_text": "0 0 10px rgba(204, 243, 129, 0.3)"
+    },
+    "borders": {
+      "subtle": "border border-white/10",
+      "highlight": "border border-primary/50"
+    },
+    "radius": {
+      "card": "rounded-2xl",
+      "button": "rounded-full",
+      "input": "rounded-xl"
+    }
+  },
+  "layout_strategies": {
+    "container": "max-w-7xl mx-auto px-6 md:px-12",
+    "section_spacing": "py-24 md:py-32",
+    "grid_bento": "grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8",
+    "dashboard_grid": "grid grid-cols-1 md:grid-cols-4 gap-6 h-full"
+  },
+  "components": {
+    "buttons": {
+      "primary": "bg-primary hover:bg-primary/90 text-white font-medium px-8 py-3 rounded-full transition-all duration-300 hover:shadow-[0_0_20px_-5px_rgba(124,58,237,0.5)] active:scale-95",
+      "secondary": "bg-secondary hover:bg-secondary/80 text-white font-medium px-8 py-3 rounded-full border border-white/10 transition-all duration-300",
+      "ghost": "hover:bg-white/5 text-muted-foreground hover:text-white px-6 py-2 rounded-full transition-colors"
+    },
+    "cards": {
+      "base": "relative overflow-hidden rounded-2xl border border-white/10 bg-black/40 backdrop-blur-xl p-8 transition-all duration-300 hover:border-white/20 hover:shadow-2xl group",
+      "interactive": "cursor-pointer hover:-translate-y-1 hover:shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)]"
+    },
+    "inputs": {
+      "base": "bg-white/5 border-white/10 focus:border-primary/50 focus:ring-primary/20 rounded-xl h-12 px-4 text-white placeholder:text-white/20 transition-all"
+    }
+  },
+  "image_urls": {
+    "hero_abstract": "https://images.unsplash.com/photo-1762278804771-65c446b6acdb?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "student_collaboration": "https://images.pexels.com/photos/5253942/pexels-photo-5253942.jpeg",
+    "freelancer_laptop": "https://images.unsplash.com/photo-1632923945657-ccd98efe59e3?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "abstract_waves": "https://images.unsplash.com/photo-1760978632061-ad00f48789ae?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "logo_placeholder": "https://via.placeholder.com/150x50?text=LOGO"
+  },
+  "instructions_to_main_agent": [
+    "CRITICAL: Implement the 'Unbounded' font for all headings. This is the core of the Gen-Z aesthetic.",
+    "CRITICAL: The theme is DARK MODE ONLY. Do not implement a light mode toggle unless explicitly asked. Force dark mode classes.",
+    "CRITICAL: The AI Chat Interface is the 'Hero'. It should not be a small widget. It should be central, large, and inviting.",
+    "Use 'glassmorphism' heavily for cards to create depth against the dark background.",
+    "Use the 'accent' color (#ccf381) sparingly for high-value actions (e.g., 'Accept Gig', 'Payment Received').",
+    "Ensure all interactive elements have the 'data-testid' attribute.",
+    "Do not use generic 'lorem ipsum'. Use realistic copy related to student gigs (e.g., 'Fix my React bug', 'Design a logo for my startup').",
+    "For the Dashboard, use the 'Control Room' grid strategy: dense, data-rich, but visually organized.",
+    "Animations: Use 'framer-motion' for smooth entrance effects. Stagger children in lists."
+  ],
+  "universal_guidelines": [
+    "Avoid 'AI slop' designs (generic centered layouts, standard Bootstrap look).",
+    "Use 2-3x more spacing than typical. 'p-8' is the minimum for content containers.",
+    "Never use pure black (#000000) for backgrounds unless it's for contrast against a dark grey. Use #050505.",
+    "Always add hover states that lift the element or glow.",
+    "Use 'sonner' for toasts."
+  ]
+}
