@@ -86,10 +86,10 @@ class CareerPlusAPITester:
         """Test user signup"""
         print("\n🔍 Testing Authentication - Signup...")
         
-        # Generate unique test user
+        # Generate unique test user with more standard email
         timestamp = datetime.now().strftime('%H%M%S')
         test_user = {
-            "email": f"test_user_{timestamp}@example.com",
+            "email": f"testuser{timestamp}@gmail.com",
             "password": "TestPass123!",
             "name": f"Test User {timestamp}"
         }
