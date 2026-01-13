@@ -73,11 +73,12 @@ export const Gigs = () => {
   };
 
   const handleFilterChange = (key, value) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+    const actualValue = value === 'all' ? '' : value;
+    setFilters(prev => ({ ...prev, [key]: actualValue }));
     
     const newParams = new URLSearchParams(searchParams);
-    if (value) {
-      newParams.set(key === 'is_urgent' ? 'urgent' : key, value.toString());
+    if (actualValue) {
+      newParams.set(key === 'is_urgent' ? 'urgent' : key, actualValue.toString());
     } else {
       newParams.delete(key === 'is_urgent' ? 'urgent' : key);
     }
@@ -120,7 +121,7 @@ export const Gigs = () => {
             </div>
 
             <Select
-              value={filters.category}
+              value={filters.category || 'all'}
               onValueChange={(value) => handleFilterChange('category', value)}
             >
               <SelectTrigger 
@@ -130,7 +131,7 @@ export const Gigs = () => {
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Categories</SelectItem>
+                <SelectItem value="all">All Categories</SelectItem>
                 {categories.map(cat => (
                   <SelectItem key={cat} value={cat}>{cat}</SelectItem>
                 ))}
