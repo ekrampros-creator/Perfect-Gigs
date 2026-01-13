@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   User, MapPin, Star, Edit2, Save, Loader2, 
-  Briefcase, Award, CheckCircle
+  Briefcase, Award
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -99,52 +99,51 @@ export const Profile = () => {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen py-8 px-4 md:px-8">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen py-8 px-4 md:px-6">
+      <div className="max-w-3xl mx-auto">
         {/* Profile Card */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="glass rounded-2xl overflow-hidden mb-8"
+          className="bg-card rounded-xl border border-border overflow-hidden mb-6"
         >
           {/* Header */}
-          <div className="relative h-32 bg-gradient-to-r from-primary/30 to-accent/10">
-            <div className="absolute -bottom-16 left-8">
-              <Avatar className="w-32 h-32 border-4 border-[#050505]">
-                <AvatarFallback className="bg-primary text-3xl text-white">
+          <div className="relative h-24 bg-gradient-to-r from-primary/20 to-accent/10">
+            <div className="absolute -bottom-12 left-6">
+              <Avatar className="w-24 h-24 border-4 border-background">
+                <AvatarFallback className="bg-primary text-2xl text-primary-foreground">
                   {user.name?.charAt(0).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
             </div>
           </div>
 
-          <div className="pt-20 px-8 pb-8">
-            <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
+          <div className="pt-16 px-6 pb-6">
+            <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-5">
               <div>
                 {editing ? (
                   <Input
                     value={formData.name}
                     onChange={(e) => handleChange('name', e.target.value)}
-                    className="text-2xl font-unbounded font-bold bg-white/5 border-white/10 text-white mb-2"
+                    className="text-lg font-heading font-semibold bg-secondary border-border text-foreground mb-1 h-9"
                     data-testid="name-input"
                   />
                 ) : (
-                  <h1 className="font-unbounded font-bold text-2xl text-white mb-2">
+                  <h1 className="font-heading font-semibold text-xl text-foreground mb-1">
                     {user.name}
                   </h1>
                 )}
-                <p className="text-muted-foreground">{user.email}</p>
+                <p className="text-muted-foreground text-sm">{user.email}</p>
                 
-                <div className="flex items-center gap-4 mt-4">
-                  <div className="flex items-center gap-2">
-                    <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
-                    <span className="text-white font-medium">
+                <div className="flex items-center gap-3 mt-3">
+                  <div className="flex items-center gap-1.5">
+                    <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                    <span className="text-foreground text-sm font-medium">
                       {user.rating || 'New'} ({user.total_reviews || 0} reviews)
                     </span>
                   </div>
                   {user.is_freelancer && (
-                    <Badge className="bg-accent/20 text-accent border-0">
-                      <CheckCircle className="w-3 h-3 mr-1" />
+                    <Badge className="bg-accent/20 text-accent border-0 text-xs">
                       Freelancer
                     </Badge>
                   )}
@@ -157,21 +156,18 @@ export const Profile = () => {
                     <Button
                       variant="outline"
                       onClick={() => setEditing(false)}
-                      className="border-white/10"
+                      className="h-8 text-xs"
                     >
                       Cancel
                     </Button>
                     <Button
                       onClick={handleSave}
                       disabled={loading}
-                      className="bg-accent hover:bg-accent/90 text-accent-foreground"
+                      className="h-8 text-xs bg-accent hover:bg-accent/90"
                       data-testid="save-profile-btn"
                     >
-                      {loading ? (
-                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                      ) : (
-                        <Save className="w-4 h-4 mr-2" />
-                      )}
+                      {loading && <Loader2 className="w-3.5 h-3.5 animate-spin mr-1" />}
+                      <Save className="w-3.5 h-3.5 mr-1" />
                       Save
                     </Button>
                   </>
@@ -179,48 +175,48 @@ export const Profile = () => {
                   <Button
                     onClick={() => setEditing(true)}
                     variant="outline"
-                    className="border-white/10"
+                    className="h-8 text-xs"
                     data-testid="edit-profile-btn"
                   >
-                    <Edit2 className="w-4 h-4 mr-2" />
-                    Edit Profile
+                    <Edit2 className="w-3.5 h-3.5 mr-1" />
+                    Edit
                   </Button>
                 )}
               </div>
             </div>
 
             {/* Bio */}
-            <div className="mb-6">
-              <Label className="text-muted-foreground text-sm mb-2 block">Bio</Label>
+            <div className="mb-5">
+              <Label className="text-muted-foreground text-xs mb-1.5 block">Bio</Label>
               {editing ? (
                 <Textarea
                   value={formData.bio}
                   onChange={(e) => handleChange('bio', e.target.value)}
                   placeholder="Tell us about yourself..."
-                  className="bg-white/5 border-white/10 text-white placeholder:text-muted-foreground"
+                  className="bg-secondary border-border text-sm min-h-[80px]"
                   data-testid="bio-input"
                 />
               ) : (
-                <p className="text-white">{user.bio || 'No bio yet'}</p>
+                <p className="text-foreground text-sm">{user.bio || 'No bio yet'}</p>
               )}
             </div>
 
             {/* Location */}
-            <div className="mb-6">
-              <Label className="text-muted-foreground text-sm mb-2 block">Location</Label>
+            <div className="mb-5">
+              <Label className="text-muted-foreground text-xs mb-1.5 block">Location</Label>
               {editing ? (
                 <div className="relative">
-                  <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
                     value={formData.location}
                     onChange={(e) => handleChange('location', e.target.value)}
                     placeholder="Your city"
-                    className="pl-12 bg-white/5 border-white/10 text-white placeholder:text-muted-foreground"
+                    className="pl-10 bg-secondary border-border text-sm h-9"
                     data-testid="location-input"
                   />
                 </div>
               ) : (
-                <div className="flex items-center gap-2 text-white">
+                <div className="flex items-center gap-1.5 text-foreground text-sm">
                   <MapPin className="w-4 h-4 text-muted-foreground" />
                   {user.location || 'Not set'}
                 </div>
@@ -229,29 +225,29 @@ export const Profile = () => {
 
             {/* Skills */}
             <div>
-              <Label className="text-muted-foreground text-sm mb-2 block">Skills</Label>
+              <Label className="text-muted-foreground text-xs mb-1.5 block">Skills</Label>
               {editing && (
-                <div className="flex gap-2 mb-3">
+                <div className="flex gap-2 mb-2">
                   <Input
                     value={skillInput}
                     onChange={(e) => setSkillInput(e.target.value)}
                     placeholder="Add a skill"
                     onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addSkill())}
-                    className="bg-white/5 border-white/10 text-white placeholder:text-muted-foreground"
+                    className="bg-secondary border-border text-sm h-9"
                     data-testid="skill-input"
                   />
-                  <Button onClick={addSkill} className="bg-primary">Add</Button>
+                  <Button onClick={addSkill} className="h-9 text-sm">Add</Button>
                 </div>
               )}
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5">
                 {formData.skills.length === 0 && !editing ? (
-                  <span className="text-muted-foreground">No skills added</span>
+                  <span className="text-muted-foreground text-sm">No skills added</span>
                 ) : (
                   formData.skills.map((skill, index) => (
                     <Badge
                       key={index}
                       variant="secondary"
-                      className="bg-primary/20 text-primary border-0 cursor-pointer"
+                      className="text-xs cursor-pointer"
                       onClick={() => editing && removeSkill(skill)}
                     >
                       {skill}
@@ -264,30 +260,30 @@ export const Profile = () => {
           </div>
         </motion.div>
 
-        {/* Freelancer Actions */}
+        {/* Freelancer CTA */}
         {!user.is_freelancer && (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="glass rounded-2xl p-8 mb-8"
+            className="bg-card rounded-xl border border-border p-5 mb-6"
           >
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-accent/20 flex items-center justify-center">
-                <Briefcase className="w-6 h-6 text-accent" />
+              <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center">
+                <Briefcase className="w-5 h-5 text-accent" />
               </div>
               <div className="flex-1">
-                <h3 className="text-white font-semibold">Want to find gig work?</h3>
-                <p className="text-muted-foreground text-sm">
-                  Register as a freelancer to get matched with opportunities
+                <h3 className="text-foreground font-medium text-sm">Want to find gig work?</h3>
+                <p className="text-muted-foreground text-xs">
+                  Register as a freelancer to get matched
                 </p>
               </div>
               <Button
                 onClick={() => navigate('/freelancer/register')}
-                className="bg-accent hover:bg-accent/90 text-accent-foreground"
+                className="h-8 text-xs bg-accent hover:bg-accent/90"
                 data-testid="register-freelancer-btn"
               >
-                Register Now
+                Register
               </Button>
             </div>
           </motion.div>
@@ -295,33 +291,33 @@ export const Profile = () => {
 
         {/* Reviews */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="glass rounded-2xl p-8"
+          className="bg-card rounded-xl border border-border p-6"
         >
-          <h2 className="font-unbounded font-semibold text-xl text-white mb-6">
+          <h2 className="font-heading font-semibold text-lg text-foreground mb-4">
             Reviews ({reviews.length})
           </h2>
 
           {reviews.length === 0 ? (
             <div className="text-center py-8">
-              <Award className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">No reviews yet</p>
+              <Award className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+              <p className="text-muted-foreground text-sm">No reviews yet</p>
             </div>
           ) : (
-            <div className="space-y-4">
-              {reviews.map((review, index) => (
-                <div key={review.id} className="p-4 glass-light rounded-xl">
-                  <div className="flex items-center gap-3 mb-2">
-                    <Avatar className="w-8 h-8">
-                      <AvatarFallback className="bg-primary/20 text-primary text-sm">
+            <div className="space-y-3">
+              {reviews.map((review) => (
+                <div key={review.id} className="p-4 bg-secondary rounded-lg">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Avatar className="w-7 h-7">
+                      <AvatarFallback className="bg-primary/10 text-primary text-xs">
                         {review.profiles?.name?.charAt(0).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
-                      <p className="text-white font-medium text-sm">{review.profiles?.name}</p>
-                      <div className="flex items-center gap-1">
+                      <p className="text-foreground font-medium text-xs">{review.profiles?.name}</p>
+                      <div className="flex items-center gap-0.5">
                         {[...Array(5)].map((_, i) => (
                           <Star
                             key={i}

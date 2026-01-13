@@ -18,9 +18,8 @@ module.exports = {
     },
     extend: {
       fontFamily: {
-        'jakarta': ['"Plus Jakarta Sans"', 'sans-serif'],
-        'unbounded': ['"Unbounded"', 'sans-serif'],
-        'mono': ['"JetBrains Mono"', 'monospace'],
+        'body': ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        'heading': ['"Space Grotesk"', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",

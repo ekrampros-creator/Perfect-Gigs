@@ -67,7 +67,7 @@ export const GigDetail = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <Loader2 className="w-6 h-6 animate-spin text-primary" />
       </div>
     );
   }
@@ -77,47 +77,44 @@ export const GigDetail = () => {
   const isOwner = user?.id === gig.created_by;
 
   return (
-    <div className="min-h-screen py-8 px-4 md:px-8">
-      <div className="max-w-4xl mx-auto">
-        {/* Back Button */}
+    <div className="min-h-screen py-8 px-4 md:px-6">
+      <div className="max-w-3xl mx-auto">
         <Button
           variant="ghost"
           onClick={() => navigate('/gigs')}
-          className="mb-6 text-muted-foreground hover:text-white"
+          className="mb-6 text-muted-foreground hover:text-foreground h-8 px-2 text-sm"
           data-testid="back-btn"
         >
-          <ArrowLeft className="w-4 h-4 mr-2" />
+          <ArrowLeft className="w-4 h-4 mr-1" />
           Back to Gigs
         </Button>
 
-        {/* Main Card */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="glass rounded-2xl overflow-hidden"
+          className="bg-card rounded-xl border border-border overflow-hidden"
         >
           {/* Header */}
-          <div className="p-8 border-b border-white/10">
-            <div className="flex flex-wrap items-start gap-3 mb-4">
-              <Badge variant="secondary" className="bg-primary/20 text-primary border-0">
+          <div className="p-6 border-b border-border">
+            <div className="flex flex-wrap items-center gap-2 mb-3">
+              <Badge variant="secondary" className="text-xs">
                 {gig.category}
               </Badge>
               {gig.is_urgent && (
-                <Badge variant="destructive" className="bg-red-500/20 text-red-400 border-0">
-                  <Zap className="w-3 h-3 mr-1" /> Urgent
+                <Badge variant="destructive" className="text-xs">
+                  Urgent
                 </Badge>
               )}
-              <Badge variant="outline" className="border-white/20 text-white">
+              <Badge variant="outline" className="text-xs capitalize">
                 {gig.status}
               </Badge>
             </div>
 
-            <h1 className="font-unbounded font-bold text-2xl md:text-3xl text-white mb-4">
+            <h1 className="font-heading font-semibold text-xl md:text-2xl text-foreground mb-4">
               {gig.title}
             </h1>
 
-            {/* Meta Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <MapPin className="w-4 h-4" />
                 <span>{gig.location}</span>
@@ -138,32 +135,30 @@ export const GigDetail = () => {
           </div>
 
           {/* Content */}
-          <div className="p-8">
-            <h2 className="font-unbounded font-semibold text-lg text-white mb-4">
-              Description
-            </h2>
-            <p className="text-muted-foreground whitespace-pre-wrap mb-8">
+          <div className="p-6">
+            <h2 className="font-medium text-foreground mb-3">Description</h2>
+            <p className="text-muted-foreground text-sm leading-relaxed whitespace-pre-wrap mb-6">
               {gig.description}
             </p>
 
-            {/* Duration */}
-            <div className="glass-light rounded-xl p-6 mb-8">
-              <h3 className="font-semibold text-white mb-3">Timeline</h3>
-              <div className="flex items-center gap-4">
+            {/* Timeline */}
+            <div className="bg-secondary rounded-lg p-4 mb-6">
+              <h3 className="font-medium text-foreground text-sm mb-2">Timeline</h3>
+              <div className="flex items-center gap-3 text-sm">
                 <div>
-                  <p className="text-xs text-muted-foreground">Start Date</p>
-                  <p className="text-white font-medium">
+                  <p className="text-xs text-muted-foreground">Start</p>
+                  <p className="text-foreground">
                     {new Date(gig.duration_start).toLocaleDateString('en-US', { 
-                      weekday: 'short', month: 'short', day: 'numeric' 
+                      month: 'short', day: 'numeric', year: 'numeric' 
                     })}
                   </p>
                 </div>
-                <div className="h-px flex-1 bg-white/10" />
+                <div className="h-px flex-1 bg-border" />
                 <div>
-                  <p className="text-xs text-muted-foreground">End Date</p>
-                  <p className="text-white font-medium">
+                  <p className="text-xs text-muted-foreground">End</p>
+                  <p className="text-foreground">
                     {new Date(gig.duration_end).toLocaleDateString('en-US', { 
-                      weekday: 'short', month: 'short', day: 'numeric' 
+                      month: 'short', day: 'numeric', year: 'numeric' 
                     })}
                   </p>
                 </div>
@@ -172,29 +167,28 @@ export const GigDetail = () => {
 
             {/* Posted By */}
             {gig.profiles && (
-              <div className="flex items-center gap-4 p-6 glass-light rounded-xl mb-8">
-                <Avatar className="w-12 h-12">
-                  <AvatarFallback className="bg-primary/20 text-primary">
+              <div className="flex items-center gap-3 p-4 bg-secondary rounded-lg mb-6">
+                <Avatar className="w-10 h-10">
+                  <AvatarFallback className="bg-primary/10 text-primary text-sm">
                     {gig.profiles.name?.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
-                  <p className="text-white font-medium">{gig.profiles.name}</p>
-                  <div className="flex items-center gap-2">
-                    <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                    <span className="text-sm text-muted-foreground">
-                      {gig.profiles.rating || 'New'} rating
-                    </span>
+                  <p className="text-foreground font-medium text-sm">{gig.profiles.name}</p>
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
+                    <span>{gig.profiles.rating || 'New'} rating</span>
                   </div>
                 </div>
                 {!isOwner && (
                   <Button
                     variant="outline"
-                    className="border-white/10 hover:bg-white/5"
+                    size="sm"
                     onClick={() => navigate(`/messages/${gig.created_by}`)}
+                    className="h-8 text-xs"
                     data-testid="contact-btn"
                   >
-                    <MessageSquare className="w-4 h-4 mr-2" />
+                    <MessageSquare className="w-3.5 h-3.5 mr-1" />
                     Contact
                   </Button>
                 )}
@@ -203,13 +197,13 @@ export const GigDetail = () => {
 
             {/* Apply Section */}
             {!isOwner && gig.status === 'open' && (
-              <div className="border-t border-white/10 pt-8">
+              <div className="border-t border-border pt-6">
                 {hasApplied ? (
-                  <div className="flex items-center gap-3 p-6 bg-green-500/10 rounded-xl">
-                    <CheckCircle className="w-6 h-6 text-green-500" />
+                  <div className="flex items-center gap-2 p-4 bg-accent/10 rounded-lg">
+                    <CheckCircle className="w-5 h-5 text-accent" />
                     <div>
-                      <p className="text-white font-medium">Application Submitted!</p>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-foreground font-medium text-sm">Application Submitted!</p>
+                      <p className="text-xs text-muted-foreground">
                         The gig owner will review your application
                       </p>
                     </div>
@@ -217,44 +211,41 @@ export const GigDetail = () => {
                 ) : showApplyForm ? (
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-white font-medium mb-2">
+                      <label className="block text-foreground font-medium text-sm mb-2">
                         Cover Letter (Optional)
                       </label>
                       <Textarea
                         value={coverLetter}
                         onChange={(e) => setCoverLetter(e.target.value)}
-                        placeholder="Introduce yourself and explain why you're a good fit for this gig..."
-                        className="min-h-[150px] bg-white/5 border-white/10 text-white placeholder:text-muted-foreground"
+                        placeholder="Introduce yourself and explain why you're a good fit..."
+                        className="min-h-[120px] bg-secondary border-border text-sm"
                         data-testid="cover-letter-input"
                       />
                     </div>
-                    <div className="flex gap-3">
+                    <div className="flex gap-2">
                       <Button
                         variant="outline"
                         onClick={() => setShowApplyForm(false)}
-                        className="border-white/10"
+                        className="h-9 text-sm"
                       >
                         Cancel
                       </Button>
                       <Button
                         onClick={handleApply}
                         disabled={applying}
-                        className="bg-accent hover:bg-accent/90 text-accent-foreground"
+                        className="h-9 text-sm bg-accent hover:bg-accent/90"
                         data-testid="submit-application-btn"
                       >
-                        {applying ? (
-                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                        ) : (
-                          <Send className="w-4 h-4 mr-2" />
-                        )}
-                        Submit Application
+                        {applying && <Loader2 className="w-4 h-4 animate-spin mr-1" />}
+                        <Send className="w-4 h-4 mr-1" />
+                        Submit
                       </Button>
                     </div>
                   </div>
                 ) : (
                   <Button
                     onClick={() => isAuthenticated ? setShowApplyForm(true) : navigate('/auth', { state: { returnTo: `/gigs/${gigId}` } })}
-                    className="w-full h-14 bg-accent hover:bg-accent/90 text-accent-foreground font-semibold rounded-xl"
+                    className="w-full h-11 bg-accent hover:bg-accent/90 font-medium"
                     data-testid="apply-btn"
                   >
                     Apply for this Gig
@@ -263,12 +254,11 @@ export const GigDetail = () => {
               </div>
             )}
 
-            {/* Owner Actions */}
             {isOwner && (
-              <div className="border-t border-white/10 pt-8">
+              <div className="border-t border-border pt-6">
                 <Button
                   onClick={() => navigate(`/gigs/${gigId}/applications`)}
-                  className="w-full h-14 bg-primary hover:bg-primary/90 font-semibold rounded-xl"
+                  className="w-full h-11 bg-primary hover:bg-primary/90 font-medium"
                   data-testid="view-applications-btn"
                 >
                   <Users className="w-4 h-4 mr-2" />
