@@ -291,8 +291,9 @@ export const AIChatButton = ({ onClick }) => {
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
       onClick={onClick}
-      className="fixed bottom-6 right-6 h-12 px-4 rounded-full bg-primary text-primary-foreground flex items-center gap-2 shadow-lg z-30 font-medium text-sm"
+      className="fixed bottom-6 right-6 h-12 px-4 rounded-full bg-primary text-primary-foreground flex items-center gap-2 shadow-lg z-[100] font-medium text-sm cursor-pointer"
       data-testid="open-ai-chat-btn"
+      style={{ pointerEvents: 'auto' }}
     >
       <Bot className="w-5 h-5" />
       <span>AI Assistant</span>
