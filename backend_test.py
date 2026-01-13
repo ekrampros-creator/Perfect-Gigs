@@ -102,6 +102,8 @@ class CareerPlusAPITester:
             data=test_user
         )
         
+        print(f"   Signup response: {response}")
+        
         if response and response.get('success'):
             self.token = response.get('access_token')
             self.user_id = response.get('user', {}).get('id')
@@ -112,6 +114,8 @@ class CareerPlusAPITester:
             if self.token:
                 print(f"   Got token from signup, user_id: {self.user_id}")
                 return True
+            else:
+                print("   No token from signup, will need to login")
             return True
         return False
 
