@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Mail, Lock, User, Sparkles, ArrowRight, Loader2 } from 'lucide-react';
+import { Mail, Lock, User, ArrowRight, Loader2 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -64,24 +64,25 @@ export const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-20">
+    <div className="min-h-screen flex items-center justify-center px-4 py-16">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md"
+        transition={{ duration: 0.3 }}
+        className="w-full max-w-sm"
       >
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-white" />
+            <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
+              <span className="text-primary-foreground font-bold text-sm">C+</span>
             </div>
-            <span className="font-unbounded font-bold text-xl text-white">Career+</span>
+            <span className="font-heading font-semibold text-lg text-foreground">Career Plus</span>
           </div>
-          <h1 className="font-unbounded font-semibold text-2xl text-white mb-2">
+          <h1 className="font-heading font-semibold text-xl text-foreground mb-1">
             {mode === 'signup' ? 'Create your account' : 'Welcome back'}
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             {mode === 'signup' 
               ? 'Start your freelance journey today'
               : 'Sign in to continue to Career Plus'
@@ -90,13 +91,13 @@ export const Auth = () => {
         </div>
 
         {/* Auth Card */}
-        <div className="glass rounded-2xl p-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="bg-card rounded-xl border border-border p-6">
+          <form onSubmit={handleSubmit} className="space-y-4">
             {mode === 'signup' && (
-              <div className="space-y-2">
-                <Label htmlFor="name" className="text-white">Full Name</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="name" className="text-sm">Full Name</Label>
                 <div className="relative">
-                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
                     id="name"
                     name="name"
@@ -104,17 +105,17 @@ export const Auth = () => {
                     placeholder="John Doe"
                     value={formData.name}
                     onChange={handleChange}
-                    className="pl-12 h-12 bg-white/5 border-white/10 text-white placeholder:text-muted-foreground"
+                    className="pl-10 h-10 bg-secondary border-border text-sm"
                     data-testid="name-input"
                   />
                 </div>
               </div>
             )}
 
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-white">Email</Label>
+            <div className="space-y-1.5">
+              <Label htmlFor="email" className="text-sm">Email</Label>
               <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   id="email"
                   name="email"
@@ -123,16 +124,16 @@ export const Auth = () => {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="pl-12 h-12 bg-white/5 border-white/10 text-white placeholder:text-muted-foreground"
+                  className="pl-10 h-10 bg-secondary border-border text-sm"
                   data-testid="email-input"
                 />
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-white">Password</Label>
+            <div className="space-y-1.5">
+              <Label htmlFor="password" className="text-sm">Password</Label>
               <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   id="password"
                   name="password"
@@ -142,7 +143,7 @@ export const Auth = () => {
                   onChange={handleChange}
                   required
                   minLength={6}
-                  className="pl-12 h-12 bg-white/5 border-white/10 text-white placeholder:text-muted-foreground"
+                  className="pl-10 h-10 bg-secondary border-border text-sm"
                   data-testid="password-input"
                 />
               </div>
@@ -151,7 +152,7 @@ export const Auth = () => {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full h-12 bg-primary hover:bg-primary/90 rounded-xl font-semibold"
+              className="w-full h-10 bg-primary hover:bg-primary/90 text-sm font-medium"
               data-testid="auth-submit-btn"
             >
               {loading ? (
@@ -166,13 +167,13 @@ export const Auth = () => {
           </form>
 
           {/* Toggle mode */}
-          <div className="mt-6 text-center">
+          <div className="mt-5 text-center">
             <p className="text-muted-foreground text-sm">
               {mode === 'signup' ? 'Already have an account?' : "Don't have an account?"}
               <button
                 type="button"
                 onClick={() => setMode(mode === 'signup' ? 'login' : 'signup')}
-                className="ml-2 text-primary hover:underline font-medium"
+                className="ml-1 text-primary hover:underline font-medium"
                 data-testid="toggle-auth-mode-btn"
               >
                 {mode === 'signup' ? 'Sign in' : 'Sign up'}
@@ -182,7 +183,7 @@ export const Auth = () => {
         </div>
 
         {/* Terms */}
-        <p className="mt-6 text-center text-xs text-muted-foreground">
+        <p className="mt-5 text-center text-xs text-muted-foreground">
           By continuing, you agree to our Terms of Service and Privacy Policy
         </p>
       </motion.div>

@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Home, Search, PlusCircle, MessageSquare, User, 
-  Menu, X, LogOut, Sparkles, Settings, Briefcase
+  Menu, X, LogOut, LayoutDashboard
 } from 'lucide-react';
 import { Button } from './ui/button';
 import { useAuth } from '../context/AuthContext';
@@ -14,7 +14,7 @@ const navItems = [
   { path: '/gigs', icon: Search, label: 'Browse Gigs' },
   { path: '/post-gig', icon: PlusCircle, label: 'Post Gig', auth: true },
   { path: '/messages', icon: MessageSquare, label: 'Messages', auth: true },
-  { path: '/dashboard', icon: Briefcase, label: 'Dashboard', auth: true },
+  { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', auth: true },
 ];
 
 export const Layout = ({ children }) => {
@@ -32,20 +32,17 @@ export const Layout = ({ children }) => {
   const filteredNavItems = navItems.filter(item => !item.auth || isAuthenticated);
 
   return (
-    <div className="min-h-screen bg-[#050505]">
-      {/* Hero glow effect */}
-      <div className="fixed inset-0 hero-glow pointer-events-none" />
-      
+    <div className="min-h-screen bg-background bg-gradient-subtle">
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-white/5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between h-14">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2" data-testid="logo-link">
               <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                <Sparkles className="w-4 h-4 text-white" />
+                <span className="text-primary-foreground font-bold text-sm">C+</span>
               </div>
-              <span className="font-unbounded font-bold text-lg text-white">Career+</span>
+              <span className="font-heading font-semibold text-foreground">Career Plus</span>
             </Link>
 
             {/* Desktop Nav */}
@@ -54,10 +51,10 @@ export const Layout = ({ children }) => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                  className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                     location.pathname === item.path
-                      ? 'bg-white/10 text-white'
-                      : 'text-muted-foreground hover:text-white hover:bg-white/5'
+                      ? 'bg-secondary text-foreground'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
                   }`}
                   data-testid={`nav-${item.label.toLowerCase().replace(' ', '-')}`}
                 >
@@ -67,24 +64,24 @@ export const Layout = ({ children }) => {
             </div>
 
             {/* Right side */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               {isAuthenticated ? (
-                <div className="hidden md:flex items-center gap-3">
+                <div className="hidden md:flex items-center gap-2">
                   <Link 
                     to="/profile" 
-                    className="flex items-center gap-2 px-3 py-2 rounded-full hover:bg-white/5 transition-colors"
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-md hover:bg-secondary transition-colors"
                     data-testid="profile-link"
                   >
-                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                    <div className="w-7 h-7 rounded-md bg-primary/10 flex items-center justify-center">
                       <User className="w-4 h-4 text-primary" />
                     </div>
-                    <span className="text-sm font-medium text-white">{user?.name}</span>
+                    <span className="text-sm font-medium text-foreground">{user?.name}</span>
                   </Link>
                   <Button
                     variant="ghost"
                     size="icon"
                     onClick={handleLogout}
-                    className="text-muted-foreground hover:text-white"
+                    className="h-8 w-8 text-muted-foreground hover:text-foreground"
                     data-testid="logout-btn"
                   >
                     <LogOut className="w-4 h-4" />
@@ -95,14 +92,14 @@ export const Layout = ({ children }) => {
                   <Button
                     variant="ghost"
                     onClick={() => navigate('/auth')}
-                    className="text-muted-foreground hover:text-white"
+                    className="text-muted-foreground hover:text-foreground h-8 px-3 text-sm"
                     data-testid="login-btn"
                   >
                     Log in
                   </Button>
                   <Button
                     onClick={() => navigate('/auth?mode=signup')}
-                    className="bg-primary hover:bg-primary/90 rounded-full"
+                    className="bg-primary hover:bg-primary/90 h-8 px-4 text-sm"
                     data-testid="signup-btn"
                   >
                     Sign up
@@ -114,11 +111,11 @@ export const Layout = ({ children }) => {
               <Button
                 variant="ghost"
                 size="icon"
-                className="md:hidden"
+                className="md:hidden h-8 w-8"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 data-testid="mobile-menu-btn"
               >
-                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
               </Button>
             </div>
           </div>
@@ -129,39 +126,40 @@ export const Layout = ({ children }) => {
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
+            initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="fixed top-16 left-0 right-0 z-40 glass-heavy border-b border-white/5 md:hidden"
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.15 }}
+            className="fixed top-14 left-0 right-0 z-40 bg-background border-b border-border md:hidden"
           >
-            <div className="px-4 py-4 space-y-2">
+            <div className="px-4 py-3 space-y-1">
               {filteredNavItems.map((item) => (
                 <Link
                   key={item.path}
                   to={item.path}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
                     location.pathname === item.path
-                      ? 'bg-white/10 text-white'
-                      : 'text-muted-foreground hover:text-white hover:bg-white/5'
+                      ? 'bg-secondary text-foreground'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
                   }`}
                 >
-                  <item.icon className="w-5 h-5" />
-                  {item.label}
+                  <item.icon className="w-4 h-4" />
+                  <span className="text-sm font-medium">{item.label}</span>
                 </Link>
               ))}
               
               {!isAuthenticated && (
-                <div className="pt-2 space-y-2">
+                <div className="pt-3 mt-3 border-t border-border space-y-2">
                   <Button
                     variant="outline"
-                    className="w-full border-white/10"
+                    className="w-full h-9 text-sm"
                     onClick={() => { navigate('/auth'); setMobileMenuOpen(false); }}
                   >
                     Log in
                   </Button>
                   <Button
-                    className="w-full bg-primary hover:bg-primary/90"
+                    className="w-full h-9 text-sm bg-primary"
                     onClick={() => { navigate('/auth?mode=signup'); setMobileMenuOpen(false); }}
                   >
                     Sign up
@@ -170,21 +168,21 @@ export const Layout = ({ children }) => {
               )}
               
               {isAuthenticated && (
-                <div className="pt-2 border-t border-white/10">
+                <div className="pt-3 mt-3 border-t border-border">
                   <Link
                     to="/profile"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-muted-foreground hover:text-white hover:bg-white/5"
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/50"
                   >
-                    <User className="w-5 h-5" />
-                    Profile
+                    <User className="w-4 h-4" />
+                    <span className="text-sm font-medium">Profile</span>
                   </Link>
                   <button
                     onClick={() => { handleLogout(); setMobileMenuOpen(false); }}
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-muted-foreground hover:text-white hover:bg-white/5 w-full"
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/50 w-full"
                   >
-                    <LogOut className="w-5 h-5" />
-                    Log out
+                    <LogOut className="w-4 h-4" />
+                    <span className="text-sm font-medium">Log out</span>
                   </button>
                 </div>
               )}
@@ -194,7 +192,7 @@ export const Layout = ({ children }) => {
       </AnimatePresence>
 
       {/* Main Content */}
-      <main className="pt-16 min-h-screen">
+      <main className="pt-14 min-h-screen">
         {children}
       </main>
 

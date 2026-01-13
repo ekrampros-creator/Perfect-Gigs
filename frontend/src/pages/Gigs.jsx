@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
-  Search, Filter, MapPin, DollarSign, Clock, Zap, 
-  ChevronDown, X, Loader2, Briefcase
+  Search, MapPin, Zap, X, Loader2, Briefcase, Clock
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -24,7 +23,6 @@ export const Gigs = () => {
     location: searchParams.get('location') || '',
     is_urgent: searchParams.get('urgent') === 'true'
   });
-  const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
     loadCategories();
@@ -57,7 +55,6 @@ export const Gigs = () => {
       if (response.data.success) {
         let filteredGigs = response.data.gigs;
         
-        // Client-side search filter
         if (filters.search) {
           const searchLower = filters.search.toLowerCase();
           filteredGigs = filteredGigs.filter(gig => 
@@ -78,7 +75,6 @@ export const Gigs = () => {
   const handleFilterChange = (key, value) => {
     setFilters(prev => ({ ...prev, [key]: value }));
     
-    // Update URL params
     const newParams = new URLSearchParams(searchParams);
     if (value) {
       newParams.set(key === 'is_urgent' ? 'urgent' : key, value.toString());
@@ -96,46 +92,44 @@ export const Gigs = () => {
   const activeFiltersCount = Object.values(filters).filter(v => v && v !== false).length;
 
   return (
-    <div className="min-h-screen py-8 px-4 md:px-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen py-8 px-4 md:px-6">
+      <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="font-unbounded font-bold text-3xl md:text-4xl text-white mb-2">
+        <div className="mb-6">
+          <h1 className="font-heading font-semibold text-2xl text-foreground mb-1">
             Browse Gigs
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Find opportunities that match your skills
           </p>
         </div>
 
-        {/* Search & Filters Bar */}
-        <div className="glass rounded-2xl p-4 mb-8">
-          <div className="flex flex-col md:flex-row gap-4">
-            {/* Search */}
+        {/* Filters */}
+        <div className="bg-card rounded-xl border border-border p-4 mb-6">
+          <div className="flex flex-col md:flex-row gap-3">
             <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 type="text"
                 placeholder="Search gigs..."
                 value={filters.search}
                 onChange={(e) => handleFilterChange('search', e.target.value)}
-                className="pl-12 h-12 bg-white/5 border-white/10 text-white placeholder:text-muted-foreground"
+                className="pl-10 h-10 bg-secondary border-border text-sm"
                 data-testid="search-input"
               />
             </div>
 
-            {/* Category Filter */}
             <Select
               value={filters.category}
               onValueChange={(value) => handleFilterChange('category', value)}
             >
               <SelectTrigger 
-                className="w-full md:w-[200px] h-12 bg-white/5 border-white/10 text-white"
+                className="w-full md:w-[180px] h-10 bg-secondary border-border text-sm"
                 data-testid="category-filter"
               >
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
-              <SelectContent className="bg-secondary border-white/10">
+              <SelectContent>
                 <SelectItem value="">All Categories</SelectItem>
                 {categories.map(cat => (
                   <SelectItem key={cat} value={cat}>{cat}</SelectItem>
@@ -143,40 +137,37 @@ export const Gigs = () => {
               </SelectContent>
             </Select>
 
-            {/* Location Filter */}
             <div className="relative">
-              <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 type="text"
                 placeholder="Location"
                 value={filters.location}
                 onChange={(e) => handleFilterChange('location', e.target.value)}
-                className="pl-12 h-12 w-full md:w-[180px] bg-white/5 border-white/10 text-white placeholder:text-muted-foreground"
+                className="pl-10 h-10 w-full md:w-[150px] bg-secondary border-border text-sm"
                 data-testid="location-filter"
               />
             </div>
 
-            {/* Urgent Toggle */}
             <Button
               variant={filters.is_urgent ? "default" : "outline"}
               onClick={() => handleFilterChange('is_urgent', !filters.is_urgent)}
-              className={`h-12 ${filters.is_urgent ? 'bg-red-500 hover:bg-red-600' : 'border-white/10 hover:bg-white/5'}`}
+              className={`h-10 text-sm ${filters.is_urgent ? 'bg-destructive hover:bg-destructive/90' : ''}`}
               data-testid="urgent-filter"
             >
-              <Zap className="w-4 h-4 mr-2" />
-              Urgent Only
+              <Zap className="w-4 h-4 mr-1.5" />
+              Urgent
             </Button>
 
-            {/* Clear Filters */}
             {activeFiltersCount > 0 && (
               <Button
                 variant="ghost"
                 onClick={clearFilters}
-                className="h-12 text-muted-foreground hover:text-white"
+                className="h-10 text-sm text-muted-foreground"
                 data-testid="clear-filters"
               >
-                <X className="w-4 h-4 mr-2" />
-                Clear ({activeFiltersCount})
+                <X className="w-4 h-4 mr-1" />
+                Clear
               </Button>
             )}
           </div>
@@ -184,82 +175,70 @@ export const Gigs = () => {
 
         {/* Results */}
         {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          <div className="flex items-center justify-center py-16">
+            <Loader2 className="w-6 h-6 animate-spin text-primary" />
           </div>
         ) : gigs.length === 0 ? (
-          <div className="text-center py-20">
-            <Briefcase className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-            <h3 className="font-unbounded font-semibold text-xl text-white mb-2">
-              No gigs found
-            </h3>
-            <p className="text-muted-foreground mb-6">
-              Try adjusting your filters or check back later
+          <div className="text-center py-16">
+            <Briefcase className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+            <h3 className="font-medium text-foreground mb-1">No gigs found</h3>
+            <p className="text-muted-foreground text-sm mb-4">
+              Try adjusting your filters
             </p>
-            <Button
-              onClick={clearFilters}
-              variant="outline"
-              className="border-white/10"
-            >
+            <Button variant="outline" onClick={clearFilters} className="text-sm">
               Clear Filters
             </Button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {gigs.map((gig, index) => (
               <motion.div
                 key={gig.id}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
+                transition={{ delay: index * 0.03 }}
                 onClick={() => navigate(`/gigs/${gig.id}`)}
-                className="p-6 rounded-2xl glass cursor-pointer group hover:border-primary/30 transition-all"
+                className="p-5 rounded-xl bg-card border border-border cursor-pointer card-hover"
                 data-testid={`gig-card-${gig.id}`}
               >
-                {/* Header */}
-                <div className="flex items-start justify-between mb-4">
-                  <Badge variant="secondary" className="bg-primary/20 text-primary border-0">
+                <div className="flex items-start justify-between mb-3">
+                  <Badge variant="secondary" className="text-xs">
                     {gig.category}
                   </Badge>
                   {gig.is_urgent && (
-                    <Badge variant="destructive" className="bg-red-500/20 text-red-400 border-0">
-                      <Zap className="w-3 h-3 mr-1" /> Urgent
+                    <Badge variant="destructive" className="text-xs">
+                      Urgent
                     </Badge>
                   )}
                 </div>
 
-                {/* Title & Description */}
-                <h3 className="font-semibold text-lg text-white mb-2 group-hover:text-primary transition-colors line-clamp-2">
+                <h3 className="font-medium text-foreground mb-2 line-clamp-2">
                   {gig.title}
                 </h3>
-                <p className="text-muted-foreground text-sm mb-4 line-clamp-3">
+                <p className="text-muted-foreground text-sm mb-3 line-clamp-2">
                   {gig.description}
                 </p>
 
-                {/* Meta */}
-                <div className="space-y-2 mb-4">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <MapPin className="w-4 h-4" />
+                <div className="space-y-1.5 mb-3 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-1.5">
+                    <MapPin className="w-3.5 h-3.5" />
                     {gig.location}
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Clock className="w-4 h-4" />
+                  <div className="flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5" />
                     {new Date(gig.duration_start).toLocaleDateString()} - {new Date(gig.duration_end).toLocaleDateString()}
                   </div>
                 </div>
 
-                {/* Footer */}
-                <div className="flex items-center justify-between pt-4 border-t border-white/10">
-                  <span className="text-accent font-semibold">
+                <div className="flex items-center justify-between pt-3 border-t border-border">
+                  <span className="text-accent font-medium text-sm">
                     ${gig.budget_min} - ${gig.budget_max}
                   </span>
-                  <div className="flex items-center gap-2">
-                    {gig.profiles && (
-                      <span className="text-xs text-muted-foreground">
-                        by {gig.profiles.name}
-                      </span>
-                    )}
-                  </div>
+                  {gig.profiles && (
+                    <span className="text-xs text-muted-foreground">
+                      by {gig.profiles.name}
+                    </span>
+                  )}
                 </div>
               </motion.div>
             ))}

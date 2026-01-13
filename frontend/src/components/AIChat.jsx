@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Sparkles, X, Bot, User, Loader2, Zap, Search, FileText, UserPlus } from 'lucide-react';
+import { Send, X, Bot, User, Loader2, Search, FileText, UserPlus, Lightbulb } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { ScrollArea } from './ui/scroll-area';
@@ -12,14 +12,14 @@ const quickActions = [
   { icon: Search, label: 'Find gigs', prompt: 'Help me find gigs' },
   { icon: FileText, label: 'Post a gig', prompt: 'I want to post a new gig' },
   { icon: UserPlus, label: 'Become freelancer', prompt: 'How do I register as a freelancer?' },
-  { icon: Zap, label: 'Quick tips', prompt: 'Give me some tips for getting started' },
+  { icon: Lightbulb, label: 'Quick tips', prompt: 'Give me some tips for getting started' },
 ];
 
 export const AIChat = ({ isOpen, onClose, isFullPage = false }) => {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      content: "Hey there! 👋 I'm your Career Plus AI assistant. I can help you find gigs, post opportunities, or set up your freelancer profile. What would you like to do today?"
+      content: "Hi! I'm your Career Plus assistant. I can help you find gigs, post opportunities, or set up your freelancer profile. What would you like to do?"
     }
   ]);
   const [input, setInput] = useState('');
@@ -66,7 +66,7 @@ export const AIChat = ({ isOpen, onClose, isFullPage = false }) => {
       console.error('AI chat error:', error);
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: "Sorry, I'm having trouble connecting right now. Please try again in a moment!"
+        content: "I'm having trouble connecting right now. Please try again in a moment."
       }]);
     } finally {
       setIsLoading(false);
@@ -118,63 +118,63 @@ export const AIChat = ({ isOpen, onClose, isFullPage = false }) => {
   };
 
   const chatContent = (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-card rounded-xl border border-border">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-white/10">
+      <div className="flex items-center justify-between px-5 py-4 border-b border-border">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-            <Sparkles className="w-5 h-5 text-primary" />
+          <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
+            <Bot className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <h3 className="font-unbounded font-semibold text-white">AI Assistant</h3>
-            <p className="text-xs text-muted-foreground">Always here to help</p>
+            <h3 className="font-heading font-semibold text-foreground text-sm">AI Assistant</h3>
+            <p className="text-xs text-muted-foreground">Here to help</p>
           </div>
         </div>
         {!isFullPage && (
-          <Button variant="ghost" size="icon" onClick={onClose} data-testid="close-chat-btn">
-            <X className="w-5 h-5" />
+          <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8" data-testid="close-chat-btn">
+            <X className="w-4 h-4" />
           </Button>
         )}
       </div>
 
       {/* Messages */}
-      <ScrollArea className="flex-1 p-4" ref={scrollRef}>
+      <ScrollArea className="flex-1 px-5 py-4" ref={scrollRef}>
         <div className="space-y-4">
           <AnimatePresence mode="popLayout">
             {messages.map((message, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
+                transition={{ duration: 0.15 }}
                 className={`flex gap-3 ${message.role === 'user' ? 'flex-row-reverse' : ''}`}
               >
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                <div className={`w-7 h-7 rounded-md flex items-center justify-center flex-shrink-0 ${
                   message.role === 'user' 
-                    ? 'bg-accent/20' 
-                    : 'bg-primary/20'
+                    ? 'bg-primary/10' 
+                    : 'bg-secondary'
                 }`}>
                   {message.role === 'user' 
-                    ? <User className="w-4 h-4 text-accent" />
-                    : <Bot className="w-4 h-4 text-primary" />
+                    ? <User className="w-3.5 h-3.5 text-primary" />
+                    : <Bot className="w-3.5 h-3.5 text-muted-foreground" />
                   }
                 </div>
                 <div className={`max-w-[80%] ${message.role === 'user' ? 'text-right' : ''}`}>
-                  <div className={`rounded-2xl px-4 py-3 ${
+                  <div className={`rounded-lg px-3.5 py-2.5 text-sm ${
                     message.role === 'user'
-                      ? 'bg-accent text-accent-foreground'
-                      : 'glass'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-secondary text-foreground'
                   }`}>
-                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                    <p className="whitespace-pre-wrap leading-relaxed">{message.content}</p>
                   </div>
                   {message.action && (
                     <Button
                       size="sm"
-                      className="mt-2 bg-primary hover:bg-primary/90"
+                      className="mt-2 h-8 text-xs bg-accent hover:bg-accent/90"
                       onClick={() => handleAction(message.action)}
                       data-testid={`action-btn-${message.action.type}`}
                     >
-                      <Zap className="w-3 h-3 mr-1" />
                       Execute Action
                     </Button>
                   )}
@@ -189,10 +189,10 @@ export const AIChat = ({ isOpen, onClose, isFullPage = false }) => {
               animate={{ opacity: 1 }}
               className="flex gap-3"
             >
-              <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                <Bot className="w-4 h-4 text-primary" />
+              <div className="w-7 h-7 rounded-md bg-secondary flex items-center justify-center">
+                <Bot className="w-3.5 h-3.5 text-muted-foreground" />
               </div>
-              <div className="glass rounded-2xl px-4 py-3">
+              <div className="bg-secondary rounded-lg px-3.5 py-2.5">
                 <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
               </div>
             </motion.div>
@@ -202,19 +202,19 @@ export const AIChat = ({ isOpen, onClose, isFullPage = false }) => {
 
       {/* Quick Actions */}
       {messages.length <= 2 && (
-        <div className="px-4 pb-2">
+        <div className="px-5 pb-3">
           <p className="text-xs text-muted-foreground mb-2">Quick actions</p>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1.5">
             {quickActions.map((action, index) => (
               <Button
                 key={index}
                 variant="outline"
                 size="sm"
-                className="text-xs border-white/10 hover:bg-white/5"
+                className="text-xs h-7 px-2.5 border-border hover:bg-secondary"
                 onClick={() => handleSend(action.prompt)}
                 data-testid={`quick-action-${index}`}
               >
-                <action.icon className="w-3 h-3 mr-1" />
+                <action.icon className="w-3 h-3 mr-1.5" />
                 {action.label}
               </Button>
             ))}
@@ -223,7 +223,7 @@ export const AIChat = ({ isOpen, onClose, isFullPage = false }) => {
       )}
 
       {/* Input */}
-      <div className="p-4 border-t border-white/10">
+      <div className="p-4 border-t border-border">
         <div className="flex gap-2">
           <Input
             ref={inputRef}
@@ -231,14 +231,15 @@ export const AIChat = ({ isOpen, onClose, isFullPage = false }) => {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Ask me anything..."
-            className="flex-1 bg-white/5 border-white/10 focus:border-primary/50"
+            className="flex-1 h-10 bg-secondary border-border text-sm"
             disabled={isLoading}
             data-testid="ai-chat-input"
           />
           <Button
             onClick={() => handleSend()}
             disabled={!input.trim() || isLoading}
-            className="bg-primary hover:bg-primary/90"
+            className="h-10 w-10 bg-primary hover:bg-primary/90"
+            size="icon"
             data-testid="send-message-btn"
           >
             <Send className="w-4 h-4" />
@@ -250,7 +251,7 @@ export const AIChat = ({ isOpen, onClose, isFullPage = false }) => {
 
   if (isFullPage) {
     return (
-      <div className="h-full glass-heavy rounded-2xl overflow-hidden">
+      <div className="h-full">
         {chatContent}
       </div>
     );
@@ -260,21 +261,20 @@ export const AIChat = ({ isOpen, onClose, isFullPage = false }) => {
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+            className="fixed inset-0 bg-black/60 z-40"
             onClick={onClose}
           />
           
-          {/* Chat Window */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="fixed bottom-4 right-4 w-[400px] h-[600px] glass-heavy rounded-2xl overflow-hidden z-50 shadow-2xl"
+            transition={{ duration: 0.15 }}
+            className="fixed bottom-4 right-4 w-[380px] h-[560px] z-50 shadow-2xl"
             data-testid="ai-chat-modal"
           >
             {chatContent}
@@ -288,13 +288,14 @@ export const AIChat = ({ isOpen, onClose, isFullPage = false }) => {
 export const AIChatButton = ({ onClick }) => {
   return (
     <motion.button
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
       onClick={onClick}
-      className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-primary flex items-center justify-center shadow-lg glow-primary z-30"
+      className="fixed bottom-6 right-6 h-12 px-4 rounded-full bg-primary text-primary-foreground flex items-center gap-2 shadow-lg z-30 font-medium text-sm"
       data-testid="open-ai-chat-btn"
     >
-      <Sparkles className="w-6 h-6 text-white" />
+      <Bot className="w-5 h-5" />
+      <span>AI Assistant</span>
     </motion.button>
   );
 };

@@ -2,40 +2,41 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
-  Sparkles, ArrowRight, Search, Users, Briefcase, Star,
-  Zap, Shield, Clock, TrendingUp
+  ArrowRight, Search, Users, Shield, Clock, TrendingUp,
+  MapPin, DollarSign, Zap
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
+import { Badge } from '../components/ui/badge';
 import { AIChat } from '../components/AIChat';
 import { miscAPI, gigsAPI } from '../lib/api';
 
 const features = [
   {
-    icon: Sparkles,
-    title: 'AI-Powered Matching',
-    description: 'Our AI assistant helps you find the perfect gig or freelancer in seconds.'
+    icon: Search,
+    title: 'Smart Matching',
+    description: 'Our system matches you with opportunities based on your skills and preferences.'
   },
   {
     icon: Shield,
-    title: 'Verified Profiles',
-    description: 'All users are verified. Ratings and reviews you can trust.'
+    title: 'Verified Users',
+    description: 'All users are verified with ratings and reviews you can trust.'
   },
   {
     icon: Clock,
     title: 'Quick Turnaround',
-    description: 'Find talent or opportunities fast. Most gigs are filled within 24 hours.'
+    description: 'Find talent or opportunities fast. Most gigs filled within 24 hours.'
   },
   {
     icon: TrendingUp,
-    title: 'Grow Your Career',
-    description: 'Build your portfolio, earn ratings, and level up your freelance game.'
+    title: 'Build Your Career',
+    description: 'Earn ratings, build your portfolio, and grow your freelance career.'
   }
 ];
 
 const categories = [
   'Web Development', 'Mobile Development', 'UI/UX Design', 'Graphic Design',
-  'Content Writing', 'Video Editing', 'Social Media', 'Data Entry'
+  'Content Writing', 'Video Editing', 'Social Media', 'Marketing'
 ];
 
 export const Home = () => {
@@ -71,47 +72,46 @@ export const Home = () => {
   return (
     <div className="relative">
       {/* Hero Section */}
-      <section className="relative min-h-[90vh] flex items-center">
-        <div className="max-w-7xl mx-auto px-6 md:px-12 py-20 md:py-32">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+      <section className="relative py-16 md:py-24">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             {/* Left - Text Content */}
             <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
             >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-light mb-6">
-                <Sparkles className="w-4 h-4 text-accent" />
-                <span className="text-sm font-medium text-accent">AI-Powered Gig Marketplace</span>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-6">
+                <span className="text-xs font-medium text-primary">AI-Powered Gig Marketplace</span>
               </div>
               
-              <h1 className="font-unbounded font-bold text-4xl sm:text-5xl lg:text-6xl text-white leading-tight mb-6">
-                Your next gig,
+              <h1 className="font-heading font-bold text-3xl sm:text-4xl lg:text-5xl text-foreground leading-tight mb-5">
+                Find your next gig,
                 <br />
                 <span className="text-primary">powered by AI</span>
               </h1>
               
-              <p className="text-lg text-muted-foreground mb-8 max-w-lg">
+              <p className="text-base text-muted-foreground mb-8 max-w-md leading-relaxed">
                 Connect with opportunities that match your skills. Post gigs, find talent, 
                 and let our AI assistant guide you every step of the way.
               </p>
 
               {/* Search Bar */}
-              <form onSubmit={handleSearch} className="flex gap-3 mb-8">
+              <form onSubmit={handleSearch} className="flex gap-2 mb-8">
                 <div className="relative flex-1">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
                     type="text"
                     placeholder="What skill are you looking for?"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-12 h-14 bg-white/5 border-white/10 rounded-xl text-white placeholder:text-muted-foreground"
+                    className="pl-10 h-11 bg-secondary border-border text-sm"
                     data-testid="hero-search-input"
                   />
                 </div>
                 <Button 
                   type="submit"
-                  className="h-14 px-8 bg-primary hover:bg-primary/90 rounded-xl font-semibold"
+                  className="h-11 px-6 bg-primary hover:bg-primary/90 text-sm font-medium"
                   data-testid="hero-search-btn"
                 >
                   Search
@@ -121,11 +121,11 @@ export const Home = () => {
               {/* Stats */}
               <div className="flex gap-8">
                 <div>
-                  <p className="font-unbounded font-bold text-3xl text-white">{stats.open_gigs}+</p>
+                  <p className="font-heading font-bold text-2xl text-foreground">{stats.open_gigs}+</p>
                   <p className="text-sm text-muted-foreground">Active Gigs</p>
                 </div>
                 <div>
-                  <p className="font-unbounded font-bold text-3xl text-white">{stats.freelancers}+</p>
+                  <p className="font-heading font-bold text-2xl text-foreground">{stats.freelancers}+</p>
                   <p className="text-sm text-muted-foreground">Freelancers</p>
                 </div>
               </div>
@@ -133,10 +133,10 @@ export const Home = () => {
 
             {/* Right - AI Chat */}
             <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="relative h-[500px] lg:h-[600px]"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.1 }}
+              className="relative h-[480px]"
             >
               <AIChat isFullPage={true} />
             </motion.div>
@@ -145,33 +145,32 @@ export const Home = () => {
       </section>
 
       {/* Categories Section */}
-      <section className="py-20 md:py-32">
-        <div className="max-w-7xl mx-auto px-6 md:px-12">
+      <section className="py-16">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-12"
+            className="text-center mb-8"
           >
-            <h2 className="font-unbounded font-semibold text-3xl md:text-4xl text-white mb-4">
-              Explore Categories
+            <h2 className="font-heading font-semibold text-xl md:text-2xl text-foreground mb-2">
+              Browse by Category
             </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Find opportunities across various fields. There's something for everyone.
+            <p className="text-muted-foreground text-sm">
+              Find opportunities across various fields
             </p>
           </motion.div>
 
-          <div className="flex flex-wrap justify-center gap-3">
+          <div className="flex flex-wrap justify-center gap-2">
             {categories.map((category, index) => (
               <motion.button
                 key={category}
-                initial={{ opacity: 0, scale: 0.9 }}
+                initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
-                transition={{ delay: index * 0.05 }}
-                whileHover={{ scale: 1.05 }}
+                transition={{ delay: index * 0.03 }}
                 onClick={() => navigate(`/gigs?category=${encodeURIComponent(category)}`)}
-                className="px-6 py-3 rounded-full glass hover:border-primary/50 transition-all text-white font-medium"
+                className="px-4 py-2 rounded-lg bg-card border border-border hover:border-primary/30 transition-colors text-sm font-medium text-foreground"
                 data-testid={`category-${category.toLowerCase().replace(/\s+/g, '-')}`}
               >
                 {category}
@@ -182,39 +181,39 @@ export const Home = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 md:py-32 bg-secondary/20">
-        <div className="max-w-7xl mx-auto px-6 md:px-12">
+      <section className="py-16 bg-card/50">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mb-10"
           >
-            <h2 className="font-unbounded font-semibold text-3xl md:text-4xl text-white mb-4">
+            <h2 className="font-heading font-semibold text-xl md:text-2xl text-foreground mb-2">
               Why Career Plus?
             </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Built for students and young professionals who want to hustle smart.
+            <p className="text-muted-foreground text-sm">
+              Built for students and young professionals
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {features.map((feature, index) => (
               <motion.div
                 key={feature.title}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="p-8 rounded-2xl glass group hover:border-primary/30 transition-all"
+                transition={{ delay: index * 0.05 }}
+                className="p-5 rounded-xl bg-card border border-border card-hover"
               >
-                <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center mb-6 group-hover:bg-primary/30 transition-colors">
-                  <feature.icon className="w-6 h-6 text-primary" />
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                  <feature.icon className="w-5 h-5 text-primary" />
                 </div>
-                <h3 className="font-unbounded font-medium text-lg text-white mb-2">
+                <h3 className="font-medium text-foreground mb-1.5">
                   {feature.title}
                 </h3>
-                <p className="text-muted-foreground text-sm">
+                <p className="text-muted-foreground text-sm leading-relaxed">
                   {feature.description}
                 </p>
               </motion.div>
@@ -225,61 +224,64 @@ export const Home = () => {
 
       {/* Recent Gigs Section */}
       {recentGigs.length > 0 && (
-        <section className="py-20 md:py-32">
-          <div className="max-w-7xl mx-auto px-6 md:px-12">
-            <div className="flex items-center justify-between mb-12">
+        <section className="py-16">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+            <div className="flex items-center justify-between mb-8">
               <div>
-                <h2 className="font-unbounded font-semibold text-3xl md:text-4xl text-white mb-2">
+                <h2 className="font-heading font-semibold text-xl md:text-2xl text-foreground mb-1">
                   Recent Opportunities
                 </h2>
-                <p className="text-muted-foreground">Fresh gigs posted by our community</p>
+                <p className="text-muted-foreground text-sm">Fresh gigs from our community</p>
               </div>
               <Button
                 variant="outline"
                 onClick={() => navigate('/gigs')}
-                className="border-white/10 hover:bg-white/5"
+                className="border-border text-sm h-9"
                 data-testid="view-all-gigs-btn"
               >
-                View All <ArrowRight className="w-4 h-4 ml-2" />
+                View All <ArrowRight className="w-4 h-4 ml-1" />
               </Button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {recentGigs.slice(0, 6).map((gig, index) => (
                 <motion.div
                   key={gig.id}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
+                  transition={{ delay: index * 0.05 }}
                   onClick={() => navigate(`/gigs/${gig.id}`)}
-                  className="p-6 rounded-2xl glass cursor-pointer group hover:border-primary/30 transition-all"
+                  className="p-5 rounded-xl bg-card border border-border cursor-pointer card-hover"
                   data-testid={`gig-card-${gig.id}`}
                 >
-                  <div className="flex items-start justify-between mb-4">
-                    <span className="px-3 py-1 rounded-full bg-primary/20 text-primary text-xs font-medium">
+                  <div className="flex items-start justify-between mb-3">
+                    <Badge variant="secondary" className="text-xs font-medium">
                       {gig.category}
-                    </span>
+                    </Badge>
                     {gig.is_urgent && (
-                      <span className="px-3 py-1 rounded-full bg-red-500/20 text-red-400 text-xs font-medium flex items-center gap-1">
-                        <Zap className="w-3 h-3" /> Urgent
-                      </span>
+                      <Badge variant="destructive" className="text-xs">
+                        Urgent
+                      </Badge>
                     )}
                   </div>
                   
-                  <h3 className="font-semibold text-lg text-white mb-2 group-hover:text-primary transition-colors line-clamp-2">
+                  <h3 className="font-medium text-foreground mb-2 line-clamp-2">
                     {gig.title}
                   </h3>
                   
-                  <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
+                  <p className="text-muted-foreground text-sm mb-3 line-clamp-2">
                     {gig.description}
                   </p>
                   
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-accent font-semibold">
+                    <span className="text-accent font-medium">
                       ${gig.budget_min} - ${gig.budget_max}
                     </span>
-                    <span className="text-muted-foreground">{gig.location}</span>
+                    <span className="text-muted-foreground text-xs flex items-center gap-1">
+                      <MapPin className="w-3 h-3" />
+                      {gig.location}
+                    </span>
                   </div>
                 </motion.div>
               ))}
@@ -289,57 +291,54 @@ export const Home = () => {
       )}
 
       {/* CTA Section */}
-      <section className="py-20 md:py-32">
-        <div className="max-w-7xl mx-auto px-6 md:px-12">
+      <section className="py-16">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.98 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="relative rounded-3xl overflow-hidden"
+            className="rounded-2xl bg-primary/5 border border-primary/20 p-8 md:p-12 text-center"
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-accent/10" />
-            <div className="relative p-12 md:p-20 text-center">
-              <h2 className="font-unbounded font-bold text-3xl md:text-5xl text-white mb-6">
-                Ready to start your journey?
-              </h2>
-              <p className="text-lg text-white/80 mb-8 max-w-2xl mx-auto">
-                Join thousands of students and young professionals finding their next opportunity on Career Plus.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button
-                  size="lg"
-                  onClick={() => navigate('/auth?mode=signup')}
-                  className="bg-white text-primary hover:bg-white/90 rounded-full px-8 font-semibold"
-                  data-testid="cta-signup-btn"
-                >
-                  Get Started Free
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  onClick={() => navigate('/gigs')}
-                  className="border-white/30 text-white hover:bg-white/10 rounded-full px-8"
-                  data-testid="cta-browse-btn"
-                >
-                  Browse Gigs
-                </Button>
-              </div>
+            <h2 className="font-heading font-semibold text-2xl md:text-3xl text-foreground mb-4">
+              Ready to get started?
+            </h2>
+            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+              Join thousands of students and professionals finding their next opportunity.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button
+                size="lg"
+                onClick={() => navigate('/auth?mode=signup')}
+                className="bg-primary hover:bg-primary/90 h-11 px-6"
+                data-testid="cta-signup-btn"
+              >
+                Get Started Free
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                onClick={() => navigate('/gigs')}
+                className="border-border h-11 px-6"
+                data-testid="cta-browse-btn"
+              >
+                Browse Gigs
+              </Button>
             </div>
           </motion.div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-12 border-t border-white/5">
-        <div className="max-w-7xl mx-auto px-6 md:px-12">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+      <footer className="py-8 border-t border-border">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                <Sparkles className="w-4 h-4 text-white" />
+              <div className="w-7 h-7 rounded-md bg-primary flex items-center justify-center">
+                <span className="text-primary-foreground font-bold text-xs">C+</span>
               </div>
-              <span className="font-unbounded font-bold text-lg text-white">Career+</span>
+              <span className="font-heading font-semibold text-foreground text-sm">Career Plus</span>
             </div>
-            <p className="text-muted-foreground text-sm">
+            <p className="text-muted-foreground text-xs">
               © 2025 Career Plus. Built for students, by students.
             </p>
           </div>
