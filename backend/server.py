@@ -209,38 +209,45 @@ async def get_optional_user(credentials: HTTPAuthorizationCredentials = Depends(
 @api_router.post("/auth/signup")
 async def signup(data: UserSignup):
     try:
-        # Create auth user
-        auth_response = supabase.auth.sign_up({
-            "email": data.email,
-            "password": data.password
-        })
+        # Check if email already exists
+        existing = supabase.table("profiles").select("id").eq("email", data.email).execute()
+        if existing.data and len(existing.data) > 0:
+            raise HTTPException(status_code=400, detail="Email already registered")
         
-        if auth_response.user:
-            # Create profile
-            profile_data = {
-                "id": auth_response.user.id,
-                "email": data.email,
-                "name": data.name,
-                "bio": "",
-                "location": "",
-                "skills": [],
-                "rating": 0,
-                "total_reviews": 0,
-                "is_freelancer": False,
-                "created_at": datetime.now(timezone.utc).isoformat()
-            }
-            supabase.table("profiles").insert(profile_data).execute()
-            
-            return {
-                "success": True,
-                "user": {
-                    "id": auth_response.user.id,
-                    "email": data.email,
-                    "name": data.name
-                },
-                "access_token": auth_response.session.access_token if auth_response.session else None
-            }
-        raise HTTPException(status_code=400, detail="Signup failed")
+        # Create user profile with hashed password
+        user_id = str(uuid.uuid4())
+        hashed_password = hash_password(data.password)
+        
+        profile_data = {
+            "id": user_id,
+            "email": data.email,
+            "name": data.name,
+            "password_hash": hashed_password,
+            "bio": "",
+            "location": "",
+            "skills": [],
+            "rating": 0,
+            "total_reviews": 0,
+            "is_freelancer": False,
+            "show_phone": False,
+            "show_email": False,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        supabase.table("profiles").insert(profile_data).execute()
+        
+        # Create access token
+        access_token = create_access_token(user_id, data.email)
+        
+        # Remove password hash from response
+        del profile_data["password_hash"]
+        
+        return {
+            "success": True,
+            "user": profile_data,
+            "access_token": access_token
+        }
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Signup error: {e}")
         raise HTTPException(status_code=400, detail=str(e))
@@ -248,21 +255,35 @@ async def signup(data: UserSignup):
 @api_router.post("/auth/login")
 async def login(data: UserLogin):
     try:
-        auth_response = supabase.auth.sign_in_with_password({
-            "email": data.email,
-            "password": data.password
-        })
+        # Find user by email
+        result = supabase.table("profiles").select("*").eq("email", data.email).execute()
         
-        if auth_response.user:
-            # Get profile
-            profile = supabase.table("profiles").select("*").eq("id", auth_response.user.id).single().execute()
-            
-            return {
-                "success": True,
-                "user": profile.data,
-                "access_token": auth_response.session.access_token
-            }
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+        if not result.data or len(result.data) == 0:
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+        
+        user = result.data[0]
+        
+        # Verify password
+        if not user.get("password_hash"):
+            # User might have registered with Google only
+            raise HTTPException(status_code=401, detail="Please use Google Sign-in for this account")
+        
+        if not verify_password(data.password, user["password_hash"]):
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+        
+        # Create access token
+        access_token = create_access_token(user["id"], user["email"])
+        
+        # Remove password hash from response
+        user_response = {k: v for k, v in user.items() if k != "password_hash"}
+        
+        return {
+            "success": True,
+            "user": user_response,
+            "access_token": access_token
+        }
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Login error: {e}")
         raise HTTPException(status_code=401, detail="Invalid credentials")
