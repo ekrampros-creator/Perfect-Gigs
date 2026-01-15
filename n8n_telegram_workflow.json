@@ -1,0 +1,326 @@
+{
+  "name": "Perfect Gigs Telegram Bot",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": ["message"],
+        "additionalFields": {}
+      },
+      "id": "telegram-trigger",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1,
+      "position": [200, 300],
+      "webhookId": "perfect-gigs-bot"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.message.text }}",
+              "operation": "startsWith",
+              "value2": "/start"
+            }
+          ]
+        }
+      },
+      "id": "check-start-command",
+      "name": "Check Start",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [400, 200]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.message.text }}",
+              "operation": "startsWith",
+              "value2": "/findgigs"
+            }
+          ]
+        }
+      },
+      "id": "check-findgigs-command",
+      "name": "Check Find Gigs",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [400, 400]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.message.text }}",
+              "operation": "startsWith",
+              "value2": "/postgig"
+            }
+          ]
+        }
+      },
+      "id": "check-postgig-command",
+      "name": "Check Post Gig",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [400, 600]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.message.text }}",
+              "operation": "startsWith",
+              "value2": "/help"
+            }
+          ]
+        }
+      },
+      "id": "check-help-command",
+      "name": "Check Help",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [400, 800]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.message.chat.id }}",
+        "text": "Welcome to Perfect Gigs Bot! 🎉\n\nI can help you:\n• /findgigs [category] - Find available gigs\n• /postgig - Start posting a new gig\n• /profile - View your profile\n• /help - Show this message\n\nLet's get started!",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "send-welcome",
+      "name": "Send Welcome",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [600, 200],
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://talentplus-3.preview.emergentagent.com/api/gigs",
+        "options": {
+          "queryParametersJson": "={{ JSON.stringify({ limit: 5, status: 'open', category: $json.message.text.replace('/findgigs', '').trim() || undefined }) }}"
+        }
+      },
+      "id": "fetch-gigs",
+      "name": "Fetch Gigs",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [600, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "const gigs = $input.first().json.gigs || [];\n\nif (gigs.length === 0) {\n  return [{ text: '😔 No gigs found. Try a different category!\\n\\nCategories: Web Development, Mobile Development, UI/UX Design, Content Writing, Video Editing, Marketing, etc.' }];\n}\n\nlet message = '🔥 *Available Gigs:*\\n\\n';\n\ngigs.forEach((gig, index) => {\n  message += `*${index + 1}. ${gig.title}*\\n`;\n  message += `💰 $${gig.budget_min}-$${gig.budget_max}\\n`;\n  message += `📍 ${gig.location}\\n`;\n  message += `📂 ${gig.category}\\n`;\n  if (gig.is_urgent) message += `🚨 URGENT\\n`;\n  message += `\\n`;\n});\n\nmessage += '\\nReply with gig number to see details!';\n\nreturn [{ text: message }];"
+      },
+      "id": "format-gigs",
+      "name": "Format Gigs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [800, 400]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').first().json.message.chat.id }}",
+        "text": "={{ $json.text }}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "send-gigs",
+      "name": "Send Gigs",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [1000, 400],
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.message.chat.id }}",
+        "text": "📝 *Post a New Gig*\n\nTo post a gig, please use our web platform:\n👉 https://talentplus-3.preview.emergentagent.com/post-gig\n\nYou'll need to provide:\n• Title\n• Description\n• Category\n• Budget range\n• Location\n• Duration\n\nNeed help? Reply with /help",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "send-postgig-info",
+      "name": "Send Post Gig Info",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [600, 600],
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.message.chat.id }}",
+        "text": "🤖 *Perfect Gigs Bot Help*\n\n*Commands:*\n/start - Welcome message\n/findgigs - Browse all open gigs\n/findgigs [category] - Find gigs by category\n/postgig - How to post a gig\n/help - This message\n\n*Categories:*\nWeb Development, Mobile Development, UI/UX Design, Graphic Design, Content Writing, Video Editing, Social Media, Data Entry, Virtual Assistant, Translation, Tutoring, Photography, Music & Audio, Marketing, Delivery\n\n*Website:*\nhttps://talentplus-3.preview.emergentagent.com\n\n💡 Tip: Use the web platform for the full experience!",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "send-help",
+      "name": "Send Help",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [600, 800],
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.message.chat.id }}",
+        "text": "I didn't understand that. Try /help to see available commands! 😊",
+        "additionalFields": {}
+      },
+      "id": "send-fallback",
+      "name": "Send Fallback",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [600, 1000],
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram Bot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Check Start",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Start": {
+      "main": [
+        [
+          {
+            "node": "Send Welcome",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Check Find Gigs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Find Gigs": {
+      "main": [
+        [
+          {
+            "node": "Fetch Gigs",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Check Post Gig",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Gigs": {
+      "main": [
+        [
+          {
+            "node": "Format Gigs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Gigs": {
+      "main": [
+        [
+          {
+            "node": "Send Gigs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Post Gig": {
+      "main": [
+        [
+          {
+            "node": "Send Post Gig Info",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Check Help",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Help": {
+      "main": [
+        [
+          {
+            "node": "Send Help",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Fallback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "pinData": {}
+}
