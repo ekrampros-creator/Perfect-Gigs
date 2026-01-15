@@ -7,7 +7,8 @@ import {
 } from 'lucide-react';
 import { Button } from './ui/button';
 import { useAuth } from '../context/AuthContext';
-import { AIChat, AIChatButton } from './AIChat';
+import { AIChatButton } from './AIChat';
+import { AIChat } from './AIChat';
 
 const navItems = [
   { path: '/', icon: Home, label: 'Home' },
@@ -40,9 +41,9 @@ export const Layout = ({ children }) => {
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2" data-testid="logo-link">
               <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-sm">C+</span>
+                <span className="text-primary-foreground font-bold text-sm">PG</span>
               </div>
-              <span className="font-heading font-semibold text-foreground">Career Plus</span>
+              <span className="font-heading font-semibold text-foreground">Perfect Gigs</span>
             </Link>
 
             {/* Desktop Nav */}
