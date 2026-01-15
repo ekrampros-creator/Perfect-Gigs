@@ -86,14 +86,14 @@ export const Home = () => {
               </div>
               
               <h1 className="font-heading font-bold text-3xl sm:text-4xl lg:text-5xl text-foreground leading-tight mb-5">
-                Find your next gig,
+                Find your perfect gig,
                 <br />
                 <span className="text-primary">powered by AI</span>
               </h1>
               
               <p className="text-base text-muted-foreground mb-8 max-w-md leading-relaxed">
                 Connect with opportunities that match your skills. Post gigs, find talent, 
-                and let our AI assistant guide you every step of the way.
+                and let Ishan guide you every step of the way.
               </p>
 
               {/* Search Bar */}
