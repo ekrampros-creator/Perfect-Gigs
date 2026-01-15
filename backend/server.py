@@ -43,12 +43,22 @@ class UserLogin(BaseModel):
     email: str
     password: str
 
+class GoogleAuthRequest(BaseModel):
+    email: str
+    name: str
+    avatar_url: Optional[str] = None
+    firebase_uid: str
+    id_token: str
+
 class ProfileUpdate(BaseModel):
     name: Optional[str] = None
     bio: Optional[str] = None
     location: Optional[str] = None
     skills: Optional[List[str]] = None
     avatar_url: Optional[str] = None
+    phone: Optional[str] = None
+    show_phone: Optional[bool] = None
+    show_email: Optional[bool] = None
 
 class FreelancerRegistration(BaseModel):
     categories: List[str]
