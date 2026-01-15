@@ -16,6 +16,7 @@ import Profile from "./pages/Profile";
 import Messages from "./pages/Messages";
 import FreelancerRegister from "./pages/FreelancerRegister";
 import GigApplications from "./pages/GigApplications";
+import Freelancers from "./pages/Freelancers";
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
             <Route path="/messages" element={<Messages />} />
             <Route path="/messages/:otherUserId" element={<Messages />} />
             <Route path="/freelancer/register" element={<FreelancerRegister />} />
+            <Route path="/freelancers" element={<Freelancers />} />
           </Routes>
         </Layout>
         <Toaster 
