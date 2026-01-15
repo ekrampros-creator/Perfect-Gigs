@@ -290,7 +290,7 @@ async def login(data: UserLogin):
 
 @api_router.post("/auth/google")
 async def google_auth(data: GoogleAuthRequest):
-    """Handle Google Sign-in - creates or updates user in Supabase"""
+    """Handle Google Sign-in - creates or updates user in database"""
     try:
         # Check if user already exists by email
         existing = supabase.table("profiles").select("*").eq("email", data.email).execute()
@@ -307,10 +307,16 @@ async def google_auth(data: GoogleAuthRequest):
             
             profile = supabase.table("profiles").select("*").eq("id", user_id).single().execute()
             
+            # Create our JWT token
+            access_token = create_access_token(user_id, data.email)
+            
+            # Remove password hash from response
+            user_data = {k: v for k, v in profile.data.items() if k != "password_hash"}
+            
             return {
                 "success": True,
-                "user": profile.data,
-                "access_token": data.id_token  # Use Firebase token
+                "user": user_data,
+                "access_token": access_token
             }
         else:
             # Create new user
@@ -333,10 +339,13 @@ async def google_auth(data: GoogleAuthRequest):
             }
             supabase.table("profiles").insert(profile_data).execute()
             
+            # Create our JWT token
+            access_token = create_access_token(user_id, data.email)
+            
             return {
                 "success": True,
                 "user": profile_data,
-                "access_token": data.id_token
+                "access_token": access_token
             }
     except Exception as e:
         logger.error(f"Google auth error: {e}")
@@ -346,7 +355,9 @@ async def google_auth(data: GoogleAuthRequest):
 async def get_me(user = Depends(get_current_user)):
     try:
         profile = supabase.table("profiles").select("*").eq("id", user.id).single().execute()
-        return {"success": True, "user": profile.data}
+        # Remove password hash from response
+        user_data = {k: v for k, v in profile.data.items() if k != "password_hash"}
+        return {"success": True, "user": user_data}
     except Exception as e:
         logger.error(f"Get me error: {e}")
         raise HTTPException(status_code=404, detail="Profile not found")
