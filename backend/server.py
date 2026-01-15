@@ -392,6 +392,41 @@ async def list_gigs(
         logger.error(f"List gigs error: {e}")
         raise HTTPException(status_code=400, detail=str(e))
 
+# ==================== FREELANCERS ====================
+
+@api_router.get("/freelancers")
+async def list_freelancers(
+    category: Optional[str] = None,
+    location: Optional[str] = None,
+    limit: int = 20,
+    offset: int = 0
+):
+    try:
+        query = supabase.table("profiles").select("id, name, bio, location, skills, rating, total_reviews, hourly_rate, freelancer_categories, freelancer_availability, email, phone, show_email, show_phone, avatar_url").eq("is_freelancer", True)
+        
+        if category:
+            query = query.contains("freelancer_categories", [category])
+        if location:
+            query = query.ilike("location", f"%{location}%")
+            
+        query = query.order("rating", desc=True).range(offset, offset + limit - 1)
+        result = query.execute()
+        
+        # Filter out private contact info
+        freelancers = []
+        for f in result.data:
+            freelancer = {**f}
+            if not freelancer.get("show_email"):
+                freelancer["email"] = None
+            if not freelancer.get("show_phone"):
+                freelancer["phone"] = None
+            freelancers.append(freelancer)
+        
+        return {"success": True, "freelancers": freelancers, "count": len(freelancers)}
+    except Exception as e:
+        logger.error(f"List freelancers error: {e}")
+        raise HTTPException(status_code=400, detail=str(e))
+
 @api_router.get("/gigs/{gig_id}")
 async def get_gig(gig_id: str):
     try:
