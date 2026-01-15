@@ -110,29 +110,48 @@ class AIMessage(BaseModel):
 
 # ==================== AUTH HELPERS ====================
 
+def create_access_token(user_id: str, email: str) -> str:
+    """Create JWT access token"""
+    expiration = datetime.now(timezone.utc) + timedelta(hours=JWT_EXPIRATION_HOURS)
+    payload = {
+        "sub": user_id,
+        "email": email,
+        "exp": expiration,
+        "iat": datetime.now(timezone.utc)
+    }
+    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """Verify a password against its hash"""
+    return pwd_context.verify(plain_password, hashed_password)
+
+def hash_password(password: str) -> str:
+    """Hash a password"""
+    return pwd_context.hash(password)
+
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
     if not credentials:
         raise HTTPException(status_code=401, detail="Not authenticated")
     try:
         token = credentials.credentials
-        # First try Supabase auth
-        try:
-            user = supabase.auth.get_user(token)
-            return user.user
-        except:
-            # If Supabase fails, try to find user by Firebase token (stored in profiles)
-            # For Google auth, we use a simpler approach - verify from stored user
-            profiles = supabase.table("profiles").select("*").not_.is_("firebase_uid", "null").execute()
-            if profiles.data:
-                # Return a mock user object with the profile data
-                class MockUser:
-                    def __init__(self, profile):
-                        self.id = profile["id"]
-                        self.email = profile["email"]
-                return MockUser(profiles.data[0])
+        # Decode our custom JWT
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        user_id = payload.get("sub")
+        if not user_id:
             raise HTTPException(status_code=401, detail="Invalid token")
-    except HTTPException:
-        raise
+        
+        # Return a simple user object
+        class UserObj:
+            def __init__(self, id, email):
+                self.id = id
+                self.email = email
+        
+        return UserObj(user_id, payload.get("email"))
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token expired")
+    except jwt.InvalidTokenError as e:
+        logger.error(f"JWT error: {e}")
+        raise HTTPException(status_code=401, detail="Invalid token")
     except Exception as e:
         logger.error(f"Auth error: {e}")
         raise HTTPException(status_code=401, detail="Invalid token")
