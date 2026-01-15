@@ -190,8 +190,17 @@ async def get_optional_user(credentials: HTTPAuthorizationCredentials = Depends(
         return None
     try:
         token = credentials.credentials
-        user = supabase.auth.get_user(token)
-        return user.user
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        user_id = payload.get("sub")
+        if not user_id:
+            return None
+        
+        class UserObj:
+            def __init__(self, id, email):
+                self.id = id
+                self.email = email
+        
+        return UserObj(user_id, payload.get("email"))
     except:
         return None
 
