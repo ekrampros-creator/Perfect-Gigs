@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Home, Search, PlusCircle, MessageSquare, User, 
-  Menu, X, LogOut, LayoutDashboard
+  Menu, X, LogOut, LayoutDashboard, Users
 } from 'lucide-react';
 import { Button } from './ui/button';
 import { useAuth } from '../context/AuthContext';
