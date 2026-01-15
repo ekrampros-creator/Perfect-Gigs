@@ -184,6 +184,60 @@ async def login(data: UserLogin):
         logger.error(f"Login error: {e}")
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
+@api_router.post("/auth/google")
+async def google_auth(data: GoogleAuthRequest):
+    """Handle Google Sign-in - creates or updates user in Supabase"""
+    try:
+        # Check if user already exists by email
+        existing = supabase.table("profiles").select("*").eq("email", data.email).execute()
+        
+        if existing.data and len(existing.data) > 0:
+            # User exists, update and return
+            user_id = existing.data[0]["id"]
+            update_data = {
+                "avatar_url": data.avatar_url,
+                "firebase_uid": data.firebase_uid,
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }
+            supabase.table("profiles").update(update_data).eq("id", user_id).execute()
+            
+            profile = supabase.table("profiles").select("*").eq("id", user_id).single().execute()
+            
+            return {
+                "success": True,
+                "user": profile.data,
+                "access_token": data.id_token  # Use Firebase token
+            }
+        else:
+            # Create new user
+            user_id = str(uuid.uuid4())
+            profile_data = {
+                "id": user_id,
+                "email": data.email,
+                "name": data.name,
+                "avatar_url": data.avatar_url,
+                "firebase_uid": data.firebase_uid,
+                "bio": "",
+                "location": "",
+                "skills": [],
+                "rating": 0,
+                "total_reviews": 0,
+                "is_freelancer": False,
+                "show_phone": False,
+                "show_email": False,
+                "created_at": datetime.now(timezone.utc).isoformat()
+            }
+            supabase.table("profiles").insert(profile_data).execute()
+            
+            return {
+                "success": True,
+                "user": profile_data,
+                "access_token": data.id_token
+            }
+    except Exception as e:
+        logger.error(f"Google auth error: {e}")
+        raise HTTPException(status_code=400, detail=str(e))
+
 @api_router.get("/auth/me")
 async def get_me(user = Depends(get_current_user)):
     try:
