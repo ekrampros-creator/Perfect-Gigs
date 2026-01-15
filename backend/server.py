@@ -8,10 +8,12 @@ from pathlib import Path
 from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import httpx
 from supabase import create_client, Client
 import json
+import jwt
+from passlib.context import CryptContext
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -20,6 +22,14 @@ load_dotenv(ROOT_DIR / '.env')
 supabase_url = os.environ.get('SUPABASE_URL')
 supabase_key = os.environ.get('SUPABASE_SERVICE_ROLE')
 supabase: Client = create_client(supabase_url, supabase_key)
+
+# Password hashing
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+# JWT settings (using Supabase JWT secret for compatibility)
+JWT_SECRET = os.environ.get('SUPABASE_JWT_SECRET', 'm4soO9yIK7mCxM2LZYlFCmfoM5M95CX9HITEbRE+u016ceMuxdAxoaeZrvOO9rSKiRj2JqvhwLJCsKhrEj8R/A==')
+JWT_ALGORITHM = "HS256"
+JWT_EXPIRATION_HOURS = 24 * 7  # 7 days
 
 # OpenAI setup
 openai_api_key = os.environ.get('OPENAI_API_KEY')
