@@ -13,6 +13,7 @@ import { AIChat } from './AIChat';
 const navItems = [
   { path: '/', icon: Home, label: 'Home' },
   { path: '/gigs', icon: Search, label: 'Browse Gigs' },
+  { path: '/freelancers', icon: Users, label: 'Freelancers' },
   { path: '/post-gig', icon: PlusCircle, label: 'Post Gig', auth: true },
   { path: '/messages', icon: MessageSquare, label: 'Messages', auth: true },
   { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', auth: true },
