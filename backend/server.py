@@ -156,35 +156,6 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         logger.error(f"Auth error: {e}")
         raise HTTPException(status_code=401, detail="Invalid token")
 
-async def get_current_user_flexible(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    """Flexible auth that works with both Supabase and Firebase tokens"""
-    if not credentials:
-        raise HTTPException(status_code=401, detail="Not authenticated")
-    try:
-        token = credentials.credentials
-        # Try to find user by the token stored in localStorage (for Google auth)
-        # This is a simplified approach - in production, you'd verify the Firebase token
-        
-        # First check if it's a Supabase token
-        try:
-            user = supabase.auth.get_user(token)
-            profile = supabase.table("profiles").select("*").eq("id", user.user.id).single().execute()
-            return profile.data
-        except:
-            pass
-        
-        # For Firebase tokens, we need to look up the user differently
-        # Since we stored the ID token, we can use it to find the user session
-        # In this simplified version, we'll look for any Google-auth user
-        # A production system would verify the JWT token properly
-        
-        raise HTTPException(status_code=401, detail="Invalid token")
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Auth error: {e}")
-        raise HTTPException(status_code=401, detail="Invalid token")
-
 async def get_optional_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
     if not credentials:
         return None
