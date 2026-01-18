@@ -759,17 +759,39 @@ Casual user: "hey can you help me find some work"
 async def ai_chat(data: AIMessage, user = Depends(get_optional_user)):
     try:
         # Build context
-        context_info = ""
-        if user and data.context:
-            if data.context.get("current_page"):
-                context_info += f"\nUser is on: {data.context.get('current_page')}"
-            if data.context.get("gig_id"):
-                context_info += f"\nViewing gig: {data.context.get('gig_id')}"
+        context_info = "\n\nCURRENT CONTEXT:"
+        if user:
+            context_info += f"\n- User is logged in"
+            if data.context and data.context.get("is_freelancer"):
+                context_info += f"\n- User IS a freelancer (can browse and apply to gigs)"
+            else:
+                context_info += f"\n- User is NOT a freelancer yet"
+        else:
+            context_info += f"\n- User is NOT logged in"
         
+        if data.context:
+            if data.context.get("current_page"):
+                context_info += f"\n- User is on page: {data.context.get('current_page')}"
+            if data.context.get("user_tone"):
+                context_info += f"\n- User's detected tone: {data.context.get('user_tone')}"
+        
+        # Build messages with conversation history
         messages = [
-            {"role": "system", "content": SYSTEM_PROMPT + context_info},
-            {"role": "user", "content": data.message}
+            {"role": "system", "content": SYSTEM_PROMPT + context_info}
         ]
+        
+        # Add conversation history (last 30 messages)
+        if data.context and data.context.get("conversation_history"):
+            history = data.context.get("conversation_history", [])[-30:]
+            for msg in history:
+                if msg.get("role") in ["user", "assistant"] and msg.get("content"):
+                    messages.append({
+                        "role": msg["role"],
+                        "content": msg["content"]
+                    })
+        
+        # Add current message
+        messages.append({"role": "user", "content": data.message})
         
         # Call OpenAI
         async with httpx.AsyncClient() as client:
@@ -783,7 +805,7 @@ async def ai_chat(data: AIMessage, user = Depends(get_optional_user)):
                     "model": "gpt-4o-mini",
                     "messages": messages,
                     "temperature": 0.7,
-                    "max_tokens": 500
+                    "max_tokens": 600
                 },
                 timeout=30.0
             )
