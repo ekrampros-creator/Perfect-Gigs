@@ -107,6 +107,7 @@ class ReviewCreate(BaseModel):
 class AIMessage(BaseModel):
     message: str
     context: Optional[Dict[str, Any]] = None
+    conversation_history: Optional[List[Dict[str, str]]] = None
 
 # ==================== AUTH HELPERS ====================
 
