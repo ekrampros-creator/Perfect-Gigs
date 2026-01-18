@@ -1,5 +1,5 @@
 {
-  "name": "Perfect Gigs Telegram Bot - Ishan AI",
+  "name": "Perfect Gigs - Ishan AI Telegram Bot",
   "nodes": [
     {
       "parameters": {
@@ -11,7 +11,7 @@
       "type": "n8n-nodes-base.telegramTrigger",
       "typeVersion": 1,
       "position": [200, 300],
-      "webhookId": "perfect-gigs-ishan-bot",
+      "webhookId": "perfect-gigs-ishan",
       "credentials": {
         "telegramApi": {
           "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
@@ -25,7 +25,7 @@
         "url": "https://talentplus-3.preview.emergentagent.com/api/telegram/chat",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ chat_id: String($json.message.chat.id), message: $json.message.text, user_name: $json.message.from.first_name }) }}",
+        "jsonBody": "={{ JSON.stringify({ chat_id: String($json.message.chat.id), message: $json.message.text || '', user_name: $json.message.from.first_name || 'User' }) }}",
         "options": {
           "timeout": 30000
         }
@@ -38,7 +38,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const response = $input.first().json;\nlet message = response.response || 'Sorry, I could not process that. Please try again!';\n\n// Clean up action markers from AI response for Telegram\nmessage = message.replace(/\\[ACTION:[^\\]]+\\]/g, '');\nmessage = message.replace(/\\[SEARCH_GIGS\\]/g, '');\nmessage = message.replace(/\\[POST_GIG\\]/g, '');\nmessage = message.replace(/\\[REGISTER_FREELANCER\\]/g, '');\n\n// Add action results if any\nif (response.action_result) {\n  const ar = response.action_result;\n  if (ar.type === 'GIG_POSTED') {\n    message += `\\n\\n✅ **Gig Posted Successfully!**\\nTitle: ${ar.title}\\nID: ${ar.gig_id}`;\n  } else if (ar.type === 'FREELANCER_REGISTERED') {\n    message += `\\n\\n✅ **You are now a freelancer!**\\nCategories: ${ar.categories.join(', ')}`;\n  } else if (ar.type === 'GIGS_FOUND' && ar.gigs && ar.gigs.length > 0) {\n    message += '\\n\\n🔍 **Found Gigs:**\\n';\n    ar.gigs.forEach((g, i) => {\n      message += `${i+1}. ${g.title} - $${g.budget_min}-$${g.budget_max} (${g.location})\\n`;\n    });\n  }\n}\n\n// Truncate if too long for Telegram\nif (message.length > 4000) {\n  message = message.substring(0, 3997) + '...';\n}\n\nreturn [{ message: message }];"
+        "jsCode": "const response = $input.first().json;\nlet message = response.response || 'Sorry, something went wrong. Try again!';\n\n// Truncate if too long for Telegram (max 4096 chars)\nif (message.length > 4000) {\n  message = message.substring(0, 3997) + '...';\n}\n\nreturn [{ message: message }];"
       },
       "id": "format-response",
       "name": "Format Response",
@@ -59,24 +59,6 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1,
       "position": [950, 300],
-      "credentials": {
-        "telegramApi": {
-          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
-          "name": "Perfect Gigs Bot"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "chatId": "={{ $('Telegram Trigger').first().json.message.chat.id }}",
-        "text": "Oops! Something went wrong. Please try again or type /help for assistance.",
-        "additionalFields": {}
-      },
-      "id": "error-handler",
-      "name": "Error Handler",
-      "type": "n8n-nodes-base.telegram",
-      "typeVersion": 1,
-      "position": [950, 500],
       "credentials": {
         "telegramApi": {
           "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
@@ -121,8 +103,7 @@
     }
   },
   "settings": {
-    "executionOrder": "v1",
-    "errorWorkflow": "error-handler"
+    "executionOrder": "v1"
   },
   "staticData": null,
   "meta": {
