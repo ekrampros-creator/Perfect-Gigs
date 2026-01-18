@@ -1105,15 +1105,17 @@ async def create_gig_from_telegram(data: Dict, chat_id: str, user_name: str) -> 
         # Parse duration
         duration_days = int(data.get("duration", "30").split()[0])
         
-        # First ensure telegram user exists in profiles
-        user_id = f"telegram_{chat_id}"
+        # Create a proper UUID for telegram user
+        user_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, f"telegram_{chat_id}"))
+        
+        # Check if telegram user exists in profiles
         existing_user = supabase.table("profiles").select("id").eq("id", user_id).execute()
         
         if not existing_user.data:
             # Create profile for telegram user
             profile_data = {
                 "id": user_id,
-                "email": f"{user_id}@telegram.user",
+                "email": f"telegram_{chat_id}@telegram.user",
                 "name": user_name,
                 "bio": "Telegram User",
                 "location": "",
