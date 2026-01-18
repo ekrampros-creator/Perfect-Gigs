@@ -889,11 +889,237 @@ async def get_stats():
 
 @api_router.get("/")
 async def root():
-    return {"message": "Career Plus API", "status": "healthy"}
+    return {"message": "Perfect Gigs API", "status": "healthy"}
 
 @api_router.get("/health")
 async def health():
     return {"status": "healthy", "timestamp": datetime.now(timezone.utc).isoformat()}
+
+# ==================== TELEGRAM BOT ====================
+
+# Store telegram user sessions (in production, use Redis or DB)
+telegram_sessions: Dict[str, Dict] = {}
+
+class TelegramMessage(BaseModel):
+    chat_id: str
+    message: str
+    user_name: Optional[str] = None
+
+class TelegramWebhook(BaseModel):
+    update_id: int
+    message: Optional[Dict[str, Any]] = None
+
+TELEGRAM_SYSTEM_PROMPT = """You are Ishan, the Perfect Gigs AI Assistant on Telegram. You help users with the gig marketplace platform.
+
+PERSONALITY:
+- Friendly, helpful, and adaptive to user's tone
+- Use emojis moderately to make conversation fun
+- Keep responses concise for Telegram format
+
+CAPABILITIES:
+1. Help users POST GIGS - collect: title, description, category, location, budget, duration
+2. Help users REGISTER AS FREELANCER - collect: skills/categories, availability, location, bio
+3. SEARCH for gigs by category
+4. Answer questions about the platform
+5. Provide career advice
+
+IMPORTANT:
+- Remember conversation context from previous messages
+- Guide users step by step through complex tasks
+- If posting a gig or registering, ask ONE question at a time
+- When you have all info for an action, confirm with user before executing
+
+RESPONSE FORMAT:
+- Keep messages short (under 300 chars when possible)
+- Use line breaks for readability
+- Add relevant emojis
+
+Available categories: """ + ", ".join(GIG_CATEGORIES) + """
+
+When ready to execute an action, format as:
+[ACTION: POST_GIG] or [ACTION: REGISTER_FREELANCER] or [ACTION: SEARCH_GIGS]
+followed by collected data
+"""
+
+@api_router.post("/telegram/chat")
+async def telegram_chat(data: TelegramMessage):
+    """Handle Telegram chat messages - same AI as web but adapted for Telegram"""
+    try:
+        chat_id = data.chat_id
+        
+        # Get or create session for this user
+        if chat_id not in telegram_sessions:
+            telegram_sessions[chat_id] = {
+                "history": [],
+                "wizard_mode": None,
+                "wizard_data": {},
+                "user_name": data.user_name
+            }
+        
+        session = telegram_sessions[chat_id]
+        
+        # Add user message to history
+        session["history"].append({"role": "user", "content": data.message})
+        
+        # Keep only last 30 messages
+        session["history"] = session["history"][-30:]
+        
+        # Build messages for OpenAI
+        messages = [
+            {"role": "system", "content": TELEGRAM_SYSTEM_PROMPT + f"\n\nUser name: {data.user_name or 'Unknown'}"}
+        ]
+        messages.extend(session["history"])
+        
+        # Call OpenAI
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                "https://api.openai.com/v1/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {openai_api_key}",
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "model": "gpt-4o-mini",
+                    "messages": messages,
+                    "temperature": 0.7,
+                    "max_tokens": 400
+                },
+                timeout=30.0
+            )
+            
+            if response.status_code != 200:
+                logger.error(f"OpenAI error: {response.text}")
+                return {"success": False, "response": "Sorry, I'm having trouble right now. Try again!"}
+            
+            result = response.json()
+            ai_response = result["choices"][0]["message"]["content"]
+            
+            # Add assistant response to history
+            session["history"].append({"role": "assistant", "content": ai_response})
+            
+            # Check for actions to execute
+            action_result = None
+            if "[ACTION: POST_GIG]" in ai_response:
+                action_result = await execute_telegram_gig_post(ai_response, chat_id)
+            elif "[ACTION: REGISTER_FREELANCER]" in ai_response:
+                action_result = await execute_telegram_freelancer_register(ai_response, chat_id)
+            elif "[ACTION: SEARCH_GIGS]" in ai_response:
+                action_result = await execute_telegram_gig_search(ai_response)
+            
+            return {
+                "success": True,
+                "response": ai_response,
+                "action_result": action_result
+            }
+            
+    except Exception as e:
+        logger.error(f"Telegram chat error: {e}")
+        return {"success": False, "response": "Oops! Something went wrong. Please try again."}
+
+async def execute_telegram_gig_post(ai_response: str, chat_id: str):
+    """Execute gig posting from Telegram"""
+    try:
+        data = parse_action_data(ai_response, "ACTION: POST_GIG")
+        if not data.get("title"):
+            return None
+            
+        gig_data = {
+            "id": str(uuid.uuid4()),
+            "title": data.get("title", "Untitled Gig"),
+            "description": data.get("description", ""),
+            "category": data.get("category", "Other"),
+            "location": data.get("location", "Remote"),
+            "budget_min": float(data.get("budget_min", data.get("budget", "50")).replace("$", "").split("-")[0]),
+            "budget_max": float(data.get("budget_max", data.get("budget", "100")).replace("$", "").split("-")[-1]),
+            "duration_start": data.get("duration_start", datetime.now(timezone.utc).strftime("%Y-%m-%d")),
+            "duration_end": data.get("duration_end", (datetime.now(timezone.utc) + timedelta(days=30)).strftime("%Y-%m-%d")),
+            "people_needed": int(data.get("people_needed", "1")),
+            "is_urgent": data.get("is_urgent", "").lower() == "yes",
+            "status": "open",
+            "created_by": f"telegram_{chat_id}",
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "applications_count": 0
+        }
+        
+        result = supabase.table("gigs").insert(gig_data).execute()
+        return {"type": "GIG_POSTED", "gig_id": gig_data["id"], "title": gig_data["title"]}
+    except Exception as e:
+        logger.error(f"Telegram gig post error: {e}")
+        return None
+
+async def execute_telegram_freelancer_register(ai_response: str, chat_id: str):
+    """Execute freelancer registration from Telegram"""
+    try:
+        data = parse_action_data(ai_response, "ACTION: REGISTER_FREELANCER")
+        
+        # Check if telegram user exists in profiles
+        existing = supabase.table("profiles").select("*").eq("id", f"telegram_{chat_id}").execute()
+        
+        profile_data = {
+            "is_freelancer": True,
+            "freelancer_categories": [c.strip() for c in data.get("categories", data.get("skills", "Other")).split(",")],
+            "freelancer_availability": data.get("availability", "Flexible"),
+            "location": data.get("location", ""),
+            "bio": data.get("bio", ""),
+            "hourly_rate": float(data.get("hourly_rate", "0").replace("$", "")) if data.get("hourly_rate") else None,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        if existing.data:
+            supabase.table("profiles").update(profile_data).eq("id", f"telegram_{chat_id}").execute()
+        else:
+            profile_data["id"] = f"telegram_{chat_id}"
+            profile_data["email"] = f"telegram_{chat_id}@telegram.user"
+            profile_data["name"] = telegram_sessions.get(chat_id, {}).get("user_name", "Telegram User")
+            profile_data["created_at"] = datetime.now(timezone.utc).isoformat()
+            supabase.table("profiles").insert(profile_data).execute()
+        
+        return {"type": "FREELANCER_REGISTERED", "categories": profile_data["freelancer_categories"]}
+    except Exception as e:
+        logger.error(f"Telegram freelancer register error: {e}")
+        return None
+
+async def execute_telegram_gig_search(ai_response: str):
+    """Execute gig search from Telegram"""
+    try:
+        data = parse_action_data(ai_response, "ACTION: SEARCH_GIGS")
+        category = data.get("category", "")
+        
+        query = supabase.table("gigs").select("title, budget_min, budget_max, location, category").eq("status", "open")
+        if category:
+            query = query.ilike("category", f"%{category}%")
+        
+        result = query.limit(5).execute()
+        return {"type": "GIGS_FOUND", "gigs": result.data}
+    except Exception as e:
+        logger.error(f"Telegram gig search error: {e}")
+        return None
+
+@api_router.post("/telegram/webhook")
+async def telegram_webhook(update: TelegramWebhook):
+    """Webhook endpoint for Telegram bot updates"""
+    try:
+        if not update.message:
+            return {"ok": True}
+        
+        chat_id = str(update.message.get("chat", {}).get("id", ""))
+        text = update.message.get("text", "")
+        user_name = update.message.get("from", {}).get("first_name", "User")
+        
+        if not chat_id or not text:
+            return {"ok": True}
+        
+        # Process through chat endpoint
+        result = await telegram_chat(TelegramMessage(
+            chat_id=chat_id,
+            message=text,
+            user_name=user_name
+        ))
+        
+        return {"ok": True, "result": result}
+    except Exception as e:
+        logger.error(f"Telegram webhook error: {e}")
+        return {"ok": False, "error": str(e)}
 
 # ==================== APP SETUP ====================
 
