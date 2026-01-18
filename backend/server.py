@@ -1159,7 +1159,8 @@ async def create_gig_from_telegram(data: Dict, chat_id: str, user_name: str) -> 
 async def register_freelancer_from_telegram(data: Dict, chat_id: str, user_name: str) -> Optional[Dict]:
     """Actually register freelancer in database from Telegram"""
     try:
-        user_id = f"telegram_{chat_id}"
+        # Create proper UUID for telegram user
+        user_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, f"telegram_{chat_id}"))
         categories = [c.strip() for c in data.get("categories", "Other").split(",")]
         
         profile_data = {
@@ -1178,7 +1179,7 @@ async def register_freelancer_from_telegram(data: Dict, chat_id: str, user_name:
             supabase.table("profiles").update(profile_data).eq("id", user_id).execute()
         else:
             profile_data["id"] = user_id
-            profile_data["email"] = f"{user_id}@telegram.user"
+            profile_data["email"] = f"telegram_{chat_id}@telegram.user"
             profile_data["name"] = user_name
             profile_data["skills"] = []
             profile_data["rating"] = 0
